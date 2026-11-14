@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vigil
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigil -d vigil"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      VIGIL_DATABASE_URL: postgresql://vigil:vigil@postgres:5432/vigil
+      VIGIL_VDEV_URL: ${VIGIL_VDEV_URL:-http://vdev:8100}
+      VIGIL_OLLAMA_URL: ${VIGIL_OLLAMA_URL:-}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+
+volumes:
+  pgdata:
