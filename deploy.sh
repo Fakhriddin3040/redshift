@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Vigil: one script for a new server.
 #
-#   cp .env.example .env      # set DOMAIN_URL, COMPOSE_PROJECT_NAME, ACME_EMAIL
+#   cp .env.example .env      # set DOMAIN_URL and COMPOSE_PROJECT_NAME
 #   ./deploy.sh               # everything, in order (see below)
 #
 # What `./deploy.sh` does:
@@ -18,6 +18,7 @@
 # start Docker itself. Running it again is safe: finished slow steps are skipped.
 #
 # Other commands:
+#   ./deploy.sh install-docker          install Docker Engine + Compose (Ubuntu / Debian, sudo); once per server
 #   ./deploy.sh up                      start the stack without touching the data
 #   ./deploy.sh train [--force]         steps 2-4 only (--force redoes every step)
 #   ./deploy.sh status                  containers, stream state, crew levels
@@ -48,11 +49,11 @@ load_env() {
   : "${COMPOSE_PROJECT_NAME:?set COMPOSE_PROJECT_NAME in .env (e.g. vigil)}"
   TRAEFIK_MODE="${TRAEFIK_MODE:-own}"
   case "$TRAEFIK_MODE" in
-    own)      : "${ACME_EMAIL:?set ACME_EMAIL in .env (e-mail used for the HTTPS certificate)}" ;;
-    external) ;;
+    own|external) ;;
     *)        die "TRAEFIK_MODE must be 'own' or 'external', not '$TRAEFIK_MODE'" ;;
   esac
-  export DOMAIN_URL COMPOSE_PROJECT_NAME TRAEFIK_MODE
+  ACME_EMAIL="${ACME_EMAIL:-}"  # optional: Let's Encrypt no longer needs an address
+  export DOMAIN_URL COMPOSE_PROJECT_NAME TRAEFIK_MODE ACME_EMAIL
 
   COMPOSE_FILES=(-f compose.yml -f compose.traefik.yml)
   [ "$TRAEFIK_MODE" = own ] && COMPOSE_FILES+=(-f compose.traefik-own.yml)
@@ -74,8 +75,36 @@ retry() {
   return 1
 }
 
+# Docker Engine + Compose plugin from Docker's own repository (Ubuntu / Debian).
+# A separate command on purpose: the normal run never installs or starts Docker.
+install_docker() {
+  if command -v docker >/dev/null && docker compose version >/dev/null 2>&1; then
+    info "Docker is already installed: $(docker --version)"
+  else
+    command -v apt-get >/dev/null || die "automatic install supports Ubuntu / Debian only; install Docker Engine by hand."
+    say "Installing Docker Engine and the Compose plugin (needs sudo)"
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq ca-certificates curl >/dev/null
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL "https://download.docker.com/linux/${ID}/gpg" -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${ID} ${VERSION_CODENAME} stable" \
+      | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null
+    info "installed: $(docker --version)"
+  fi
+  sudo systemctl enable --now docker >/dev/null 2>&1 || true
+  if ! id -nG "$USER" | grep -qw docker; then
+    sudo usermod -aG docker "$USER"
+    info "added $USER to the docker group: log out and in again, then run ./deploy.sh"
+  fi
+}
+
 check_docker() {
-  command -v docker >/dev/null || die "Docker is not installed. Install Docker Engine with the Compose plugin first."
+  command -v docker >/dev/null || die "Docker is not installed. Run: ./deploy.sh install-docker   (or install Docker Engine with the Compose plugin yourself)."
   docker compose version >/dev/null 2>&1 || die "The Docker Compose plugin is missing (docker compose version fails)."
   docker info >/dev/null 2>&1 || die "The Docker daemon is not running, or this user may not use it. This script does not start Docker."
 }
@@ -171,22 +200,36 @@ up() {
   info "virtual devices are streaming live"
 
   say "Checks"
+  # The backend may still be working through the replayed history when vdev
+  # reports "live", so the checks are repeated for up to two minutes.
   dc exec -T backend python - <<'PY' || die "the stack is up but a check failed (see above)"
 import json, sys, time, urllib.request
 base = "http://localhost:8000/api/v1"
 get = lambda p: json.load(urllib.request.urlopen(base + p, timeout=10))
-time.sleep(3)
-health, crew, radiation = get("/health"), get("/crew"), get("/radiation")
-learned = sum(c["baseline"]["state"] == "learned" for c in crew)
-incidents = sum(a["key"] == "incident" for c in crew for a in get(f"/crew/{c['id']}/alerts"))
-checks = [
-    ("no rejected frames", health["bad_frames"] == health["unknown_frames"] == health["stale_frames"] == 0),
-    ("7 crew members streaming", len(crew) == 7 and all(c["now_ts"] for c in crew)),
-    ("6 baselines learned, 1 learning", learned == 6),
-    ("every level is Usual", all(c["level"] == 0 for c in crew)),
-    ("no incident on normal data", incidents == 0),
-    ("NASA radiation series loaded", len(radiation["days"]) == 14),
-]
+
+def run():
+    health, crew, radiation = get("/health"), get("/crew"), get("/radiation")
+    learned = sum(c["baseline"]["state"] == "learned" for c in crew)
+    incidents = sum(a["key"] == "incident" for c in crew for a in get(f"/crew/{c['id']}/alerts"))
+    return [
+        ("no rejected frames", health["bad_frames"] == health["unknown_frames"] == health["stale_frames"] == 0),
+        ("history written to the database", health["write_queue"] == 0),
+        ("7 crew members streaming", len(crew) == 7 and all(c["now_ts"] for c in crew)),
+        ("6 baselines learned, 1 learning", learned == 6),
+        ("every level is Usual", all(c["level"] == 0 for c in crew)),
+        ("no incident on normal data", incidents == 0),
+        ("NASA radiation series loaded", len(radiation["days"]) == 14),
+    ]
+
+deadline = time.monotonic() + 120
+while True:
+    try:
+        checks = run()
+    except Exception as exc:  # the backend is busy: try again
+        checks = [(f"backend answers ({exc})", False)]
+    if all(ok for _, ok in checks) or time.monotonic() > deadline:
+        break
+    time.sleep(3)
 for name, ok in checks:
     print(f"   {'ok ' if ok else 'FAIL'} {name}")
 sys.exit(0 if all(ok for _, ok in checks) else 1)
@@ -269,7 +312,10 @@ cmd="${1:-all}"
 
 case "$cmd" in
   incidents|help|-h|--help)
-    [ "$cmd" = incidents ] && incidents || sed -n '2,29p' "$0" | sed 's/^# \{0,1\}//'
+    [ "$cmd" = incidents ] && incidents || sed -n '2,31p' "$0" | sed 's/^# \{0,1\}//'
+    exit 0 ;;
+  install-docker)
+    install_docker
     exit 0 ;;
 esac
 
