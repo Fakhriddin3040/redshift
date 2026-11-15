@@ -17,6 +17,7 @@ from vigil.backend.hub import Hub
 from vigil.backend.narrate import load_actions
 from vigil.backend.writer import Writer
 from vigil.core.pattern_model import PatternModel
+from vigil.llm import create_provider, get_llm_settings
 
 API_PREFIX = "/api/v1"
 log = logging.getLogger("vigil.app")
@@ -34,7 +35,8 @@ async def lifespan(app: Litestar) -> AsyncIterator[None]:
     writer = Writer(db)
     model = PatternModel.load(settings.pattern_model)
     log.info("pattern model: %s", "loaded" if model else "not found, using the rule")
-    hub = Hub(db, writer, load_actions(settings.actions_file), model)
+    llm = create_provider(get_llm_settings())
+    hub = Hub(db, writer, load_actions(settings.actions_file), model, llm)
     await hub.load()
     await hub.load_radiation()
     writer.start()
@@ -45,6 +47,8 @@ async def lifespan(app: Litestar) -> AsyncIterator[None]:
     finally:
         await writer.stop()
         await app.state.vdev.aclose()
+        if llm is not None:
+            await llm.aclose()
         await db.close()
 
 

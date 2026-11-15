@@ -33,6 +33,8 @@ async def health(hub: Hub) -> dict[str, Any]:
         "unknown_frames": hub.unknown_frames,
         "stale_frames": hub.stale_frames,
         "write_queue": hub.writer.pending,
+        "llm": hub.llm is not None,
+        "llm_usage": hub.llm.usage() if hub.llm is not None else None,
     }
 
 

@@ -26,6 +26,8 @@ from vigil.core.frame import MEASURED_FIELDS, Frame, FrameError, FrameType, unpa
 from vigil.core.minute import Minute, MinuteAggregator, from_minute_frame, ppco2
 from vigil.core.pattern_model import PatternModel
 from vigil.core.pipeline import CrewState, Incident, MinuteResult
+from vigil.llm import explain
+from vigil.llm.provider import LLMError, LLMProvider
 
 log = logging.getLogger("vigil.hub")
 
@@ -175,11 +177,14 @@ class Hub:
         writer: Writer,
         actions: dict[str, dict[str, list[str]]] | None = None,
         pattern_model: PatternModel | None = None,
+        llm: LLMProvider | None = None,
     ) -> None:
         self.db = db
         self.writer = writer
         self.actions = actions or {}
         self.pattern_model = pattern_model
+        self.llm = llm
+        self._llm_tasks: set[asyncio.Task] = set()
         self.radiation: list[dict[str, Any]] = []
         self.sleep_cache: tuple[float, dict[int, list[dict[str, Any]]]] | None = None
         self.crews: dict[int, CrewRuntime] = {}
@@ -319,6 +324,43 @@ class Hub:
         if name != "normal" and p >= PATTERN_MIN_P:
             inc.pattern, inc.p = name, p
 
+    def _request_explanation(self, rt: CrewRuntime, inc: Incident) -> None:
+        """Ask the LLM, in the background, to explain an alert that just reached a
+        new level. Ingest never waits for it; the template text is already shown."""
+        if self.llm is None:
+            return
+        facts = explain.summary(inc)
+        if facts is None:
+            return
+        task = asyncio.get_running_loop().create_task(
+            self._explain(rt, inc, inc.level, facts)
+        )
+        self._llm_tasks.add(task)
+        task.add_done_callback(self._llm_tasks.discard)
+
+    async def _explain(
+        self, rt: CrewRuntime, inc: Incident, level: int, facts: dict[str, Any]
+    ) -> None:
+        try:
+            reply = await self.llm.chat(explain.messages(facts))
+        except LLMError:
+            return  # logged by the provider; the template text stays
+        except Exception:
+            log.exception("llm call failed unexpectedly; the template text stays")
+            return
+        bad = explain.problems(reply, facts)
+        if bad:
+            log.warning(
+                "llm answer rejected (%s); the template text stays", "; ".join(bad)
+            )
+            return
+        if rt.state.incident is not inc or inc.level != level or not inc.text:
+            return  # the alert moved on while the model was writing
+        inc.text = {**inc.text, "why": explain.clean(reply), "level": level}
+        inc.text_src = "llm"
+        self.writer.alert(alert_tuple(rt.id, inc))
+        self._publish(rt, {"t": "alert", "alert": alert_json(rt.id, inc)})
+
     def _on_minute(self, rt: CrewRuntime, m: Minute, history: bool) -> None:
         res = rt.state.on_minute(m)
         rt.window.append(res)
@@ -345,7 +387,19 @@ class Hub:
                     self._name_pattern(rt, inc)
                 text = template_text(inc, self.actions)
                 if text is not None:
-                    inc.text, inc.text_src = text, "template"
+                    # An explanation the LLM wrote for this level stays; the title
+                    # and the steps keep coming from the template and actions.yaml.
+                    if (
+                        inc.text_src == "llm"
+                        and inc.text
+                        and inc.text.get("level") == inc.level
+                    ):
+                        text |= {"why": inc.text["why"], "level": inc.level}
+                    else:
+                        inc.text_src = "template"
+                    inc.text = text
+            if not history and res.level > 0 and res.level_raised:
+                self._request_explanation(rt, inc)
             self.writer.alert(alert_tuple(rt.id, inc))
             if not history and (
                 res.incident_event != "updated" or res.level != res.prev_level

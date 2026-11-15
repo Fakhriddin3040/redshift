@@ -48,7 +48,7 @@ If block A is not finished by 16:00, drop everything in block C and move its tim
 | Alert text (T6a) | **Done.** `docs/actions.yaml` + templates | `text_src = "template"` |
 | Check-in on the server (T6b) | **Done** for check-in. The Report page is still assembled in the browser | `POST /crew/{id}/checkin` |
 | Pattern classifier (T7) | **Done.** XGBoost, macro-F1 0.99 on simulated windows of people not in training; loaded by the backend without the xgboost package | `ml/models/pattern.json`, `docs/DATA_NOTES.md` §9 |
-| LLM (T8) | **Not done, cut.** Text is from templates | say "template explanations" |
+| LLM (T8) | **Done without fine-tuning.** Provider-independent client (`LLM_*` variables, any OpenAI-compatible API), answer check, template fallback. With `deepseek-flash` 141 of 141 validation answers pass the check. Fine-tuning scripts are written, not run | `docs/DATA_NOTES.md` §11. Allowed claim: "a language model explains each alert; every number is checked". Not allowed: "fine-tuned" or "on-board" |
 | Client | Radiation and Sleep pages show data; Today record rows filled | `client/src/app` |
 | Compose | `postgres`, `backend`, `vdev`, `client` | `compose.yml` |
 | Repository (T10) | `LICENSE`, English `README.md`, `docs/AI_USE.md`, `docs/DATA_LICENSES.md`, `docs/DATA_NOTES.md` written; `.idea/` no longer tracked. **Still to do by a person:** make the repository public, decide on the Russian documents, fill in the designers' tools in `AI_USE.md` | `git status` |

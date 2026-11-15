@@ -29,7 +29,7 @@ export function Notices() {
             <span className="lvl" style={{ color: t.tone }}>{t.label}</span>
             <span className="title">{t.title}</span>
             <span className="body">{t.body}</span>
-            {t.explained && <span className="src">Explained on board</span>}
+            {t.explained && <span className="src">Explained by the language model</span>}
             <div className="actions">
               {t.action && <Link className="btn btn-primary" href={t.action.href}>{t.action.label}</Link>}
               <button

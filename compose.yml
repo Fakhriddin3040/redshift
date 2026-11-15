@@ -31,7 +31,12 @@ services:
       VIGIL_DATABASE_URL: postgresql://vigil:vigil@postgres:5432/vigil
       # Fixed: inside the container localhost is the container itself.
       VIGIL_VDEV_URL: http://vdev:8100
-      VIGIL_OLLAMA_URL: ${VIGIL_OLLAMA_URL:-}
+      # LLM for alert explanations: any OpenAI-compatible API, or empty = templates only.
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_TIMEOUT: ${LLM_TIMEOUT:-60}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-3}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     healthcheck:

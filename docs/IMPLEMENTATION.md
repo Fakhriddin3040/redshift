@@ -1228,7 +1228,7 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 |---|---|---|
 | `VIGIL_DATABASE_URL` | `postgresql://vigil:vigil@localhost:5432/vigil` | пул asyncpg |
 | `VIGIL_VDEV_URL` | `http://localhost:8100` | `/sim/*` |
-| `VIGIL_OLLAMA_URL` | пусто | пока не используется (LLM-3) |
+| `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_TIMEOUT`, `LLM_MAX_RETRIES` | пусто / 60 / 3 | любой OpenAI-совместимый API для объяснения тревог; пусто = шаблоны (`vigil/llm/`) |
 | `VIGIL_PATTERN_MODEL` | `ml/models/pattern.json` | пока не используется (ML-4) |
 | `VIGIL_ACTIONS_FILE` | `docs/actions.yaml` | пока не используется (LLM-0) |
 | `VIGIL_CORS_ORIGIN` | `*` | CORS; через запятую |

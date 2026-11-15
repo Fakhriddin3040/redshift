@@ -1,0 +1,13 @@
+# Libraries for ml/finetune_llm.py only. They are NOT part of the project's
+# dependencies: the application, its Docker images and the rest of ml/ never
+# import them. Install into a separate environment on a machine with a GPU:
+#
+#   python -m venv .venv-finetune && . .venv-finetune/bin/activate
+#   pip install -r ml/requirements-finetune.txt
+torch>=2.4
+transformers>=4.46
+peft>=0.13
+datasets>=3.0
+accelerate>=1.0
+# Only for FT_LOAD_4BIT=1 (smaller GPUs):
+bitsandbytes>=0.44

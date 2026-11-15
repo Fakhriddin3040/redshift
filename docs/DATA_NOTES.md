@@ -368,3 +368,34 @@ Why: in the real recordings, "rest" covers sitting, office work, lunch and drivi
 This is a finding about the detector, not about the data: on real daily life, one "rest" norm for heart rate is too coarse. Making it work needs a wider or multi-level heart-rate norm, or a longer Watch run for heart rate; neither was done.
 
 What can be claimed (`docs/TASKS.md` §5): "simulated vital signs with parameters taken from open datasets". Real recordings are used to fit and test the context rule (§3) and the noise model (§4), and the cabin CO₂ and the radiation dose are real NASA data.
+
+---
+
+## 11. C10 — language model for the alert explanation (`ml/llm_dataset.py`, `ml/llm_eval.py`)
+
+The model writes only the "why" sentence of an alert that the rules have already raised. The title and the steps stay with the template and `docs/actions.yaml`. Its answer is shown only if it passes an automatic check (`vigil/llm/explain.py`): every number must appear in the summary it was given, no other pattern may be named, and the length must be within limits. Anything else leaves the template text in place.
+
+Validation set: 141 alert summaries from the simulator (10 % of 1 412; six incident scenarios × random severity × 7 crew profiles × 8 seeds, one summary each time an alert reaches a new level). The model is asked exactly as the backend asks it.
+
+| Model (2026-11-15) | Answers accepted | Median response | 95th percentile |
+|---|---|---|---|
+| `deepseek-flash` through the DeepSeek API, reasoning mode off, answer limited to 120 tokens | **141 of 141 (100 %)** | 1.2 s | 3.5 s |
+| same model, reasoning mode on, 200-token limit | 21 of 36 (58 %) | 2.0 s | 3.6 s |
+
+**Rule from the plan (at least 98 % accepted): met**, so the model may be used.
+
+Why the second row failed: with reasoning on, the hidden reasoning used up the token limit and 15 of 36 answers came back empty or cut off. Two changes followed, neither specific to a provider: a reply cut off by the token limit is now treated as an error (a half sentence is never shown), and extra request fields can be set with `LLM_EXTRA_BODY`. For this provider it is `{"thinking": {"type": "disabled"}}`.
+
+Cost per request with these settings, measured over the 141 requests: 187 prompt tokens and 39 answer tokens on average, about 226 in total. Three limits keep spending bounded:
+
+| Limit | Value in the deployment | Effect |
+|---|---|---|
+| `LLM_MAX_TOKENS` | 120 | an answer that does not fit is dropped and the template is shown |
+| `LLM_MAX_CALLS_PER_HOUR` | 30 (default) | further alerts in that hour keep the template text |
+| one request per alert level | built in | an alert asks at most three times (Watch, Alert, Critical), never every minute |
+
+So the live application cannot spend more than about 30 × 226 ≈ 6 800 tokens per hour. `GET /api/v1/health` shows the running totals in `llm_usage`. `ml/llm_eval.py` and `ml/llm_dataset.py --teacher provider` are batch runs started by a person and are not capped.
+
+What "accepted" does and does not mean: it means no number was invented and no other pattern was named. It does not measure how well the sentence reads; a person should read a sample before the demo. No fine-tuning was run; the provider's model is used as it is. `ml/finetune_llm.py` exists for a self-hosted model and has not been run.
+
+The provider receives the alert summary only: readings, ranges, level, context. No names, ids or timestamps.

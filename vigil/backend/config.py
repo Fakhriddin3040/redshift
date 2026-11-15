@@ -10,7 +10,6 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql://vigil:vigil@localhost:5432/vigil"
     vdev_url: str = "http://localhost:8100"
-    ollama_url: str = ""
     pattern_model: str = "ml/models/pattern.json"
     actions_file: str = "docs/actions.yaml"
     cors_origin: str = "*"

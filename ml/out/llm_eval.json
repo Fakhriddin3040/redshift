@@ -1,0 +1,11 @@
+{
+  "rows": 141,
+  "accepted": 141,
+  "accepted_share": 1.0,
+  "threshold": 0.98,
+  "use_llm_in_demo": true,
+  "rejected_by_reason": {},
+  "seconds_median": 1.16,
+  "seconds_p95": 3.53,
+  "examples_rejected": []
+}

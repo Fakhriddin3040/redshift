@@ -53,6 +53,43 @@ Only Traefik is reachable from outside. With `TRAEFIK_MODE=external` the script 
 | `./deploy.sh up` / `down` / `logs [service]` | start without touching the data / stop / follow logs |
 | `./deploy.sh train --force` | redo the data preparation and the training |
 
+## LLM (optional)
+
+Alert text works without any language model: it is built from templates. If an LLM is configured, it writes the "why" sentence of each alert; the title and the steps still come from the template and from `docs/actions.yaml`.
+
+The integration does not know any provider or model. It talks to any OpenAI-compatible API and is configured only by environment variables (in `.env`):
+
+```env
+LLM_BASE_URL=https://api.example.com/v1
+LLM_API_KEY=your-api-key
+LLM_MODEL=model-name
+LLM_TIMEOUT=60
+LLM_MAX_RETRIES=3
+```
+
+Optional limits and switches: `LLM_MAX_TOKENS` (token limit per answer), `LLM_MAX_CALLS_PER_HOUR` (default 30; further alerts keep the template text), `LLM_EXTRA_BODY` (extra request fields some providers need, as JSON). Token totals are shown in `GET /api/v1/health` under `llm_usage`.
+
+To switch provider or model, change `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL` and restart the backend (`./deploy.sh up`). No code changes. Leave `LLM_BASE_URL` or `LLM_MODEL` empty and the LLM is off.
+
+| Part | Where | What it does |
+|---|---|---|
+| Provider abstraction | `vigil/llm/provider.py` | `LLMProvider` interface; one implementation for OpenAI-compatible APIs with timeout, retries with back-off, error handling and logging |
+| Settings | `vigil/llm/config.py` | reads the `LLM_*` variables; nothing else holds a URL, a key or a model name |
+| Alert explanation | `vigil/llm/explain.py` | builds the summary the model sees (no names, no ids) and checks the answer: every number must be in the summary, no other pattern may be named |
+| Use in the backend | `vigil/backend/hub.py` | asks in the background when an alert reaches a new level; ingest never waits. A failed, late or rejected answer leaves the template text in place |
+
+Fine-tuning is separate from the application and shares no code or libraries with it:
+
+```bash
+python -m ml.llm_dataset --teacher provider      # dataset from simulated alerts; teacher = the LLM above (or --teacher template)
+pip install -r ml/requirements-finetune.txt      # in its own environment, on a GPU machine
+FT_BASE_MODEL=<model id or path> FT_DATASET=data/llm/train.jsonl FT_VALID_DATASET=data/llm/valid.jsonl \
+FT_OUTPUT_DIR=runs/explainer-1 FT_EXPORT=both python ml/finetune_llm.py
+python -m ml.llm_eval                            # share of answers that pass the check, response time
+```
+
+`ml/finetune_llm.py` takes the base model, the data and every training parameter from `FT_*` variables, a JSON file or options, and writes the LoRA adapter (`adapter/`), optionally the merged model (`merged/`) and `run.json` into `FT_OUTPUT_DIR`. To deploy the result, serve it with any OpenAI-compatible server and set `LLM_BASE_URL` and `LLM_MODEL`.
+
 ## Try the demo
 
 Open the **Demo** panel in the bottom corner.
@@ -101,6 +138,7 @@ The crew's vital signs in the demo are **simulated**; the abnormal episodes are 
 | False alarms on normal data | 0 incidents in 315 simulated person-days | `python -m ml.eval_false_alarms --seeds 3` |
 | Context rule on people it was not fitted on (real recordings) | 88 % by day (5 people), 81–85 % by night (9 nights) | `python -m ml.calc_context` |
 | Pattern classifier on simulated people it was not trained on | macro-F1 0.99 over 8 classes | `python -m ml.train_xgb` |
+| Language-model explanations that pass the number check | 141 of 141 on validation alerts (`deepseek-flash`) | `python -m ml.llm_eval` |
 | Time to each level per scenario | hypoxia: Watch at minute 5, Alert at 8, Critical at 12 | `python -m ml.eval_scenarios` |
 
 The abnormal classes are simulated, so the last two rows say how well Vigil recognises **our models** of each deviation, not real patients. Details and limits: [`docs/DATA_NOTES.md`](docs/DATA_NOTES.md).
@@ -138,6 +176,8 @@ API reference (Swagger): <http://localhost:8000/api/v1/docs/swagger>
 | `VIGIL_DATABASE_URL` | `postgresql://vigil:vigil@localhost:5432/vigil` |
 | `VIGIL_VDEV_URL` | `http://localhost:8100` (fixed to `http://vdev:8100` in Compose) |
 | `VIGIL_ACTIONS_FILE` | `docs/actions.yaml` |
+| `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` | empty (LLM off) |
+| `LLM_TIMEOUT`, `LLM_MAX_RETRIES` | `60`, `3` |
 | `VIGIL_CORS_ORIGIN` | `*` |
 | `VDEV_INGEST_URL` | `ws://localhost:8000/api/v1/ingest` |
 | `VDEV_BACKEND_URL` | `http://localhost:8000/api/v1` |
