@@ -8,7 +8,7 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 # NEXT_PUBLIC_* values are inlined into the bundle at build time.
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
-ARG NEXT_PUBLIC_CREW_ID=1
+ARG NEXT_PUBLIC_CREW_ID=8
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_CREW_ID=$NEXT_PUBLIC_CREW_ID
 COPY --from=deps /app/node_modules ./node_modules

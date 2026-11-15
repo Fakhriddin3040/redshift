@@ -232,7 +232,7 @@ flowchart TD
 | 3 | `f.ts ≤ dev.last_ts` | отброшен (дубликат/прошлое) | `stale_frames` |
 | 4 | иначе | `DeviceStats.observe(f)`, дальше по типу | `dev.received`, `dev.lost` |
 
-Связь `dev_id → человек` — из таблицы `crew` (`dev_id` 1…7 ↔ `crew.id` 1…7), строится в `Hub.load()` в словарь `by_dev`.
+Связь `dev_id → человек` — из таблицы `crew` (`dev_id` 1…7 ↔ `crew.id` 1…7 — виртуальные; `dev_id` 50 ↔ `crew.id` 8 — реальный браслет), строится в `Hub.load()` в словарь `by_dev`.
 
 ### 4.3 `DeviceStats.observe(f)` — что запоминается об устройстве
 
@@ -973,7 +973,7 @@ slope_per_min = Σ(t − x̄)(v − ȳ) / Σ(t − x̄)² × 60
 | `alert` | инцидент или системное уведомление | `writer` (upsert по `id`) | restore, `/alerts`, `/metric` events, ack |
 | `checkin`, `report`, `radiation_daily` | — | пока никто (созданы на будущее) | `reset` их чистит |
 
-Экипаж в `schema.sql`: 1 M. Lindqvist (Flight Engineer), 2 T. Herrera (Commander), 3 A. Tanabe (Mission Specialist), 4 N. Dube (Flight Engineer), 5 J. Weber (Mission Specialist), 6 P. Raman (Payload Specialist), 7 D. Markov (Crew Medical Officer); `dev_id` = `id`. Роли — заглушки.
+Экипаж в `schema.sql`: 1 M. Lindqvist (Flight Engineer), 2 T. Herrera (Commander), 3 A. Tanabe (Mission Specialist), 4 N. Dube (Flight Engineer), 5 J. Weber (Mission Specialist), 6 P. Raman (Payload Specialist), 7 D. Markov (Crew Medical Officer), 8 Crew 8 (Wristband wearer — реальный браслет, `dev_id` 50; имя и роль — заглушки); для 1…7 `dev_id` = `id`. Роли — заглушки.
 
 ### 14.2 Столбцы `agg_1m` — откуда каждое число
 
@@ -1056,7 +1056,7 @@ flowchart LR
 
 ### 16.1 `GET /health`
 
-`{"ok", "bad_frames", "unknown_frames", "stale_frames", "write_queue"}` — счётчики из §4.2 и длина очереди записи.
+`{"ok", "bad_frames", "unknown_frames", "stale_frames", "write_queue", "llm", "ask", "llm_usage"}` — счётчики из §4.2, длина очереди записи, включены ли LLM и Ask Vigil (§16.10), расход запросов и токенов.
 
 ### 16.2 `GET /crew` — список экипажа
 
@@ -1218,6 +1218,20 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 
 ---
 
+### 16.10 `POST /crew/{id}/ask` — Ask Vigil
+
+Вопрос члена экипажа о собственных записях. Тело: `{"question": "…", "history": [{"role": "user"|"assistant", "content": "…"}]}`; `history` необязательна, из неё берутся только последние 3 пары «вопрос — ответ».
+
+| Шаг | Что происходит | Где |
+|---|---|---|
+| 1 | Проверка: человек существует (иначе 404), модель настроена (иначе 503), вопрос — непустой текст до 300 символов, у человека есть данные (иначе 400) | `routes.crew_ask` |
+| 2 | Собирается запись одного человека: текущие показатели и коридоры, минимум/максимум за час, тревоги за 24 часа с текстом, сон, отметка о check-in. Без имени и id; числа уже отформатированы строками | `ask.record` |
+| 3 | Свой лимит вопросов в час (`LLM_ASK_MAX_CALLS_PER_HOUR`); вопросы также входят в общий `LLM_MAX_CALLS_PER_HOUR` | `ask.Asker` |
+| 4 | Запрос к модели: системное сообщение с правилами и записью, история, вопрос; лимит токенов `LLM_ASK_MAX_TOKENS` | `ask.messages` |
+| 5 | Проверка ответа: длина 10–800 символов; каждое число есть в записи или в вопросе; не названа картина тревоги, которой нет в записи и в вопросе; обычные предложения, не список | `ask.problems` |
+
+Ответ всегда `200`: `{"answer": "…", "src": "llm"}`, либо фиксированная фраза `{"answer": "…", "src": "none", "reason": "rejected"|"unavailable"|"cap"}`. В `GET /health` поле `ask` показывает, включён ли Ask Vigil; клиент прячет кнопку, если нет.
+
 ## 17. Конфигурация и развёртывание
 
 ### 17.1 Переменные окружения (`backend/config.py`)
@@ -1229,6 +1243,7 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 | `VIGIL_DATABASE_URL` | `postgresql://vigil:vigil@localhost:5432/vigil` | пул asyncpg |
 | `VIGIL_VDEV_URL` | `http://localhost:8100` | `/sim/*` |
 | `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_TIMEOUT`, `LLM_MAX_RETRIES` | пусто / 60 / 3 | любой OpenAI-совместимый API для объяснения тревог; пусто = шаблоны (`vigil/llm/`) |
+| `LLM_ASK_MAX_TOKENS`, `LLM_ASK_MAX_CALLS_PER_HOUR` | 300 / 15 | Ask Vigil (§16.10): лимит токенов ответа и число вопросов в час; 0 = выключено |
 | `VIGIL_PATTERN_MODEL` | `ml/models/pattern.json` | пока не используется (ML-4) |
 | `VIGIL_ACTIONS_FILE` | `docs/actions.yaml` | пока не используется (LLM-0) |
 | `VIGIL_CORS_ORIGIN` | `*` | CORS; через запятую |

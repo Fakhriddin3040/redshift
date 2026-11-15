@@ -207,8 +207,13 @@ import json, sys, time, urllib.request
 base = "http://localhost:8000/api/v1"
 get = lambda p: json.load(urllib.request.urlopen(base + p, timeout=10))
 
+# Crew 8 is the real wristband, not a virtual device: it may be silent or not worn,
+# so these checks cover the seven virtual crew members only.
+VIRTUAL = range(1, 8)
+
 def run():
-    health, crew, radiation = get("/health"), get("/crew"), get("/radiation")
+    health, radiation = get("/health"), get("/radiation")
+    crew = [c for c in get("/crew") if c["id"] in VIRTUAL]
     learned = sum(c["baseline"]["state"] == "learned" for c in crew)
     incidents = sum(a["key"] == "incident" for c in crew for a in get(f"/crew/{c['id']}/alerts"))
     return [

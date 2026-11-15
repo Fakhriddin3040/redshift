@@ -74,5 +74,8 @@ insert into crew (id, name, role, dev_id) values
   (4, 'N. Dube', 'Flight Engineer', 4),
   (5, 'J. Weber', 'Mission Specialist', 5),
   (6, 'P. Raman', 'Payload Specialist', 6),
-  (7, 'D. Markov', 'Crew Medical Officer', 7)
+  (7, 'D. Markov', 'Crew Medical Officer', 7),
+  -- The real wristband (frames with dev_id 50); crew 1-7 are the virtual devices.
+  -- Name and role are placeholders.
+  (8, 'Crew 8', 'Wristband wearer', 50)
 on conflict (id) do nothing;

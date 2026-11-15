@@ -27,8 +27,11 @@ class LLMError(Exception):
 
 
 class LLMProvider(Protocol):
-    async def chat(self, messages: list[Message]) -> str:
-        """Return the assistant's reply to a list of chat messages."""
+    async def chat(
+        self, messages: list[Message], *, max_tokens: int | None = None
+    ) -> str:
+        """Return the assistant's reply to a list of chat messages.
+        `max_tokens` replaces the configured token limit for this one request."""
         ...
 
     def usage(self) -> dict[str, int]:
@@ -74,7 +77,9 @@ class OpenAICompatibleProvider:
         self._calls.append(now)
         return True
 
-    async def chat(self, messages: list[Message]) -> str:
+    async def chat(
+        self, messages: list[Message], *, max_tokens: int | None = None
+    ) -> str:
         s = self.settings
         if not self._within_cap():
             self._usage["refused_by_cap"] += 1
@@ -85,7 +90,7 @@ class OpenAICompatibleProvider:
             "model": s.model,
             "messages": messages,
             "temperature": s.temperature,
-            "max_tokens": s.max_tokens,
+            "max_tokens": max_tokens or s.max_tokens,
             **s.extra_body,
         }
         attempts = max(0, s.max_retries) + 1

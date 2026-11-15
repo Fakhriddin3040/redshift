@@ -7,6 +7,7 @@ from litestar import Request, Response, get, post, websocket
 from litestar.connection import WebSocket
 from litestar.exceptions import (
     NotFoundException,
+    ServiceUnavailableException,
     ValidationException,
     WebSocketDisconnect,
 )
@@ -16,6 +17,7 @@ from vigil.backend import views
 from vigil.backend.db import METRIC_COLUMNS
 from vigil.backend.hub import CrewRuntime, Hub
 from vigil.backend.serialize import alert_json, record_to_incident
+from vigil.llm import ask
 
 
 def crew_or_404(hub: Hub, crew_id: int) -> CrewRuntime:
@@ -26,7 +28,7 @@ def crew_or_404(hub: Hub, crew_id: int) -> CrewRuntime:
 
 
 @get("/health")
-async def health(hub: Hub) -> dict[str, Any]:
+async def health(request: Request, hub: Hub) -> dict[str, Any]:
     return {
         "ok": True,
         "bad_frames": hub.bad_frames,
@@ -34,6 +36,7 @@ async def health(hub: Hub) -> dict[str, Any]:
         "stale_frames": hub.stale_frames,
         "write_queue": hub.writer.pending,
         "llm": hub.llm is not None,
+        "ask": getattr(request.app.state, "asker", None) is not None,
         "llm_usage": hub.llm.usage() if hub.llm is not None else None,
     }
 
@@ -110,6 +113,35 @@ async def crew_checkin(hub: Hub, crew_id: int, data: dict[str, Any]) -> dict[str
     except (TypeError, ValueError) as exc:
         raise ValidationException(str(exc)) from exc
     return await hub.file_checkin(rt, body)
+
+
+@post("/crew/{crew_id:int}/ask", status_code=200)
+async def crew_ask(
+    request: Request, hub: Hub, crew_id: int, data: dict[str, Any]
+) -> dict[str, Any]:
+    """Ask Vigil: a question about this crew member's own record (vigil/llm/ask.py)."""
+    rt = crew_or_404(hub, crew_id)
+    asker: ask.Asker | None = getattr(request.app.state, "asker", None)
+    if asker is None:
+        raise ServiceUnavailableException("Ask Vigil is off: no language model")
+    question = data.get("question")
+    question = " ".join(question.split()) if isinstance(question, str) else ""
+    if not question:
+        raise ValidationException("question must be a non-empty text")
+    if len(question) > ask.MAX_QUESTION_CHARS:
+        raise ValidationException(
+            f"question is longer than {ask.MAX_QUESTION_CHARS} characters"
+        )
+    if rt.now_ts is None:
+        raise ValidationException("no data for this crew member yet")
+    past = [
+        record_to_incident(rec)[1]
+        for rec in await hub.db.incidents_between(
+            crew_id, rt.now_ts - ask.PAST_WINDOW_S, rt.now_ts
+        )
+    ]
+    facts = ask.record(rt, await hub.nights(rt.id), past)
+    return await asker.answer(facts, question, data.get("history"))
 
 
 def _scale(data: dict[str, Any], key: str) -> int:
@@ -234,6 +266,7 @@ ROUTES = [
     crew_today,
     crew_sleep,
     crew_checkin,
+    crew_ask,
     radiation,
     crew_metric,
     crew_alerts,

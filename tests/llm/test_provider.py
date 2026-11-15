@@ -173,3 +173,16 @@ async def test_hourly_cap_refuses_extra_requests_and_usage_is_counted():
     for _ in range(5):
         await unlimited.chat(MESSAGES)
     assert unlimited.usage()["requests"] == 5
+
+
+async def test_token_limit_can_be_set_for_one_request():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(json.loads(request.content)["max_tokens"])
+        return reply()
+
+    p = make(handler, max_tokens=120)
+    await p.chat(MESSAGES, max_tokens=300)
+    await p.chat(MESSAGES)
+    assert seen == [300, 120]

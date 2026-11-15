@@ -1,4 +1,6 @@
-import type { Alert, CrewItem, MetricKey, MetricResponse, RadiationResponse, RangeKey, SleepResponse, Today } from "./types";
+import type {
+  Alert, AskAnswer, AskTurn, CrewItem, Health, MetricKey, MetricResponse, RadiationResponse, RangeKey, SleepResponse, Today,
+} from "./types";
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1").replace(/\/$/, "");
 
@@ -42,6 +44,9 @@ export const api = {
     request<{ day: string; filed_ts: number }>(`/crew/${crew}/checkin`, { method: "POST", body: JSON.stringify(body) }),
   radiation: () => request<RadiationResponse>("/radiation"),
   ack: (id: number) => request<Alert>(`/alerts/${id}/ack`, { method: "POST" }),
+  health: () => request<Health>("/health"),
+  ask: (crew: number, question: string, history: AskTurn[]) =>
+    request<AskAnswer>(`/crew/${crew}/ask`, { method: "POST", body: JSON.stringify({ question, history }) }),
 
   simState: () => request<unknown>("/sim/state"),
   simScenario: (body: unknown) => request<unknown>("/sim/scenario", { method: "POST", body: JSON.stringify(body) }),

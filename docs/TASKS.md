@@ -49,6 +49,7 @@ If block A is not finished by 16:00, drop everything in block C and move its tim
 | Check-in on the server (T6b) | **Done** for check-in. The Report page is still assembled in the browser | `POST /crew/{id}/checkin` |
 | Pattern classifier (T7) | **Done.** XGBoost, macro-F1 0.99 on simulated windows of people not in training; loaded by the backend without the xgboost package | `ml/models/pattern.json`, `docs/DATA_NOTES.md` §9 |
 | LLM (T8) | **Done without fine-tuning.** Provider-independent client (`LLM_*` variables, any OpenAI-compatible API), answer check, template fallback. With `deepseek-flash` 141 of 141 validation answers pass the check. Fine-tuning scripts are written, not run | `docs/DATA_NOTES.md` §11. Allowed claim: "a language model explains each alert; every number is checked". Not allowed: "fine-tuned" or "on-board" |
+| Ask Vigil (LLM-5) | **Built, not measured with the real model.** `POST /crew/{id}/ask`, the record builder and the answer check (`vigil/llm/ask.py`), the panel in the client. Tested with a stand-in model only | Allowed claim: "a crew member can ask about their own record; every number in the answer is checked". Not allowed: any pass rate, until it is measured |
 | Client | Radiation and Sleep pages show data; Today record rows filled | `client/src/app` |
 | Compose | `postgres`, `backend`, `vdev`, `client` | `compose.yml` |
 | Repository (T10) | `LICENSE`, English `README.md`, `docs/AI_USE.md`, `docs/DATA_LICENSES.md`, `docs/DATA_NOTES.md` written; `.idea/` no longer tracked. **Still to do by a person:** make the repository public, decide on the Russian documents, fill in the designers' tools in `AI_USE.md` | `git status` |
@@ -78,7 +79,7 @@ Use `vigil.core.frame.Frame`, `pack`, `Flag`, `FrameType` to build frames. Do no
 |---|---|---|
 | Ingest URL | `ws://<backend>:8000/api/v1/ingest` | `routes.py`, `app.py` |
 | Message | one binary message = one 32-byte frame | `routes.ingest` |
-| Device ids | `dev_id` 1…7 map to crew 1…7 | `schema.sql` |
+| Device ids | `dev_id` 1…7 map to crew 1…7 (virtual); `dev_id` 50 maps to crew 8 (the real wristband) | `schema.sql` |
 | Unknown `dev_id` | frame dropped, `unknown_frames += 1` | `hub.handle_frame` |
 | Time order | per device, `ts` must be **strictly greater** than the previous frame's `ts`, otherwise the frame is dropped as stale | `hub.handle_frame` |
 | Type 1 | one second of data | `frame.py` |
@@ -354,7 +355,7 @@ With the time left this is the first task to cut. Cutting it costs nothing in th
 
 ### Not planned
 
-Device token (PR-2), day-level drift (DET-5), light theme (FE-15), wristband hardware (P101+), Ask Vigil chat, Exercise page.
+Device token (PR-2), day-level drift (DET-5), light theme (FE-15), wristband hardware (P101+), Exercise page.
 
 ---
 

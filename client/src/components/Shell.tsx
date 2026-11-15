@@ -8,6 +8,7 @@ import { METRIC, fmt, fmtRange, hhmmss, levelColor } from "@/lib/format";
 import { pageLevel, useVigil } from "@/lib/store";
 import { bannerText, criticalSteps, criticalWhy, incidentOf } from "@/lib/text";
 import type { CrewItem, Today } from "@/lib/types";
+import { AskPanel } from "./AskPanel";
 import { DemoPanel } from "./DemoPanel";
 
 const NAV = [
@@ -186,6 +187,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
       </main>
       {showCritical && <CriticalScreen onShow={onShow} />}
+      {/* The Critical screen hides everything except what it asks for. */}
+      <AskPanel hidden={showCritical} />
       <DemoPanel crew={crew} />
     </div>
   );

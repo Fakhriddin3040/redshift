@@ -191,3 +191,26 @@ export interface RadiationResponse {
   mean_14d: number | null;
   total_14d: number | null;
 }
+
+/** GET /health: only the fields the client reads. */
+export interface Health {
+  ok: boolean;
+  llm: boolean;
+  /** Ask Vigil is available (a language model is configured). */
+  ask?: boolean;
+}
+
+/**
+ * POST /crew/{id}/ask. `src` is "llm" for an answer that passed the server's
+ * check, "none" for the fixed sentence shown when it did not or the model failed.
+ */
+export interface AskAnswer {
+  answer: string;
+  src: "llm" | "none";
+  reason?: "rejected" | "unavailable" | "cap";
+}
+
+export interface AskTurn {
+  role: "user" | "assistant";
+  content: string;
+}

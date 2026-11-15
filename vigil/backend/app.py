@@ -18,6 +18,7 @@ from vigil.backend.narrate import load_actions
 from vigil.backend.writer import Writer
 from vigil.core.pattern_model import PatternModel
 from vigil.llm import create_provider, get_llm_settings
+from vigil.llm.ask import create_asker
 
 API_PREFIX = "/api/v1"
 log = logging.getLogger("vigil.app")
@@ -35,7 +36,10 @@ async def lifespan(app: Litestar) -> AsyncIterator[None]:
     writer = Writer(db)
     model = PatternModel.load(settings.pattern_model)
     log.info("pattern model: %s", "loaded" if model else "not found, using the rule")
-    llm = create_provider(get_llm_settings())
+    llm_settings = get_llm_settings()
+    llm = create_provider(llm_settings)
+    app.state.asker = create_asker(llm, llm_settings)
+    log.info("ask vigil: %s", "on" if app.state.asker else "off")
     hub = Hub(db, writer, load_actions(settings.actions_file), model, llm)
     await hub.load()
     await hub.load_radiation()

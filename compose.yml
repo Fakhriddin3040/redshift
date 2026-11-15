@@ -68,7 +68,7 @@ services:
       args:
         # Baked into the browser bundle, so it must be reachable from the browser (host), not the compose network.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:${BACKEND_PORT:-8000}/api/v1}
-        NEXT_PUBLIC_CREW_ID: ${NEXT_PUBLIC_CREW_ID:-1}
+        NEXT_PUBLIC_CREW_ID: ${NEXT_PUBLIC_CREW_ID:-8}
     restart: unless-stopped
     depends_on:
       backend:

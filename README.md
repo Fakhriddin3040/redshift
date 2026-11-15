@@ -4,7 +4,7 @@ Crew health monitoring for long space missions, built for NASA Space Apps 2026.
 
 Each crew member wears a wristband. Vigil learns that person's own usual range for heart rate, blood oxygen, breathing and skin temperature, watches the cabin air, and raises a clear, staged alert — Watch, Alert, Critical — with the reason and the next steps, without waiting for the ground.
 
-**Prototype, not a medical device.** There is no hardware yet: a virtual device (`vdev`) streams the same 32-byte frames a wristband would send.
+**Prototype, not a medical device.** There is no hardware yet: a virtual device (`vdev`) streams the same 32-byte frames a wristband would send. Crew members 1–7 are virtual. Crew member 8 is reserved for one real wristband (`dev_id` 50), and the page opens as crew member 8 by default (`NEXT_PUBLIC_CREW_ID`); until that wristband sends data its page is empty.
 
 ## Run it
 
@@ -12,7 +12,7 @@ Each crew member wears a wristband. Vigil learns that person's own usual range f
 docker compose up --build
 ```
 
-Then open <http://localhost:3000>. The first start takes about 20 seconds: the virtual device sends 14 days of history so that six of the seven crew members already have a learned baseline (the seventh is on day 4 of learning).
+Then open <http://localhost:3000>. The first start takes about 20 seconds: the virtual device sends 14 days of history so that six of the seven virtual crew members already have a learned baseline (the seventh is on day 4 of learning).
 
 If port 5432 is taken on your machine: `POSTGRES_PORT=5433 docker compose up --build`.
 
@@ -67,7 +67,9 @@ LLM_TIMEOUT=60
 LLM_MAX_RETRIES=3
 ```
 
-Optional limits and switches: `LLM_MAX_TOKENS` (token limit per answer), `LLM_MAX_CALLS_PER_HOUR` (default 30; further alerts keep the template text), `LLM_EXTRA_BODY` (extra request fields some providers need, as JSON). Token totals are shown in `GET /api/v1/health` under `llm_usage`.
+Optional limits and switches: `LLM_MAX_TOKENS` (token limit per answer), `LLM_MAX_CALLS_PER_HOUR` (default 30; further alerts keep the template text), `LLM_EXTRA_BODY` (extra request fields some providers need, as JSON), `LLM_ASK_MAX_TOKENS` (default 300) and `LLM_ASK_MAX_CALLS_PER_HOUR` (default 15; 0 switches Ask Vigil off). Token totals are shown in `GET /api/v1/health` under `llm_usage`.
+
+**Ask Vigil.** With an LLM configured, the page shows an **Ask Vigil** button. A crew member can ask about their own record ("How did I sleep last night?", "What alerts did I have today?"). The model is sent that one person's record (current readings and usual ranges, the last hour, alerts of the last 24 hours with their text, sleep, whether the check-in is filed; no name, no id) and answers from it. The answer is shown only if every number in it is in the record or in the question and it names no alert pattern that the record does not contain; otherwise a fixed sentence is shown. Questions have their own hourly cap, which also counts towards `LLM_MAX_CALLS_PER_HOUR`, so they cannot use up the requests that alert explanations need. The endpoint has no login, like the rest of this prototype: the cap is what limits spending.
 
 To switch provider or model, change `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL` and restart the backend (`./deploy.sh up`). No code changes. Leave `LLM_BASE_URL` or `LLM_MODEL` empty and the LLM is off.
 
@@ -77,6 +79,7 @@ To switch provider or model, change `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL
 | Settings | `vigil/llm/config.py` | reads the `LLM_*` variables; nothing else holds a URL, a key or a model name |
 | Alert explanation | `vigil/llm/explain.py` | builds the summary the model sees (no names, no ids) and checks the answer: every number must be in the summary, no other pattern may be named |
 | Use in the backend | `vigil/backend/hub.py` | asks in the background when an alert reaches a new level; ingest never waits. A failed, late or rejected answer leaves the template text in place |
+| Ask Vigil | `vigil/llm/ask.py`, `POST /api/v1/crew/{id}/ask`, `client/src/components/AskPanel.tsx` | builds the record the model sees, checks the answer, keeps the hourly cap; the panel is hidden when no LLM is configured |
 
 Fine-tuning is separate from the application and shares no code or libraries with it:
 
@@ -92,7 +95,7 @@ python -m ml.llm_eval                            # share of answers that pass th
 
 ## Try the demo
 
-Open the **Demo** panel in the bottom corner.
+Open the **Demo** panel in the bottom corner and first choose one of the seven virtual crew members under **Crewmember**. The page opens as crew member 8, the real wristband, which the simulator does not drive: a scenario started for it is refused with "unknown crew 8". The choice is remembered in this browser.
 
 | Do this | You see |
 |---|---|
@@ -100,7 +103,7 @@ Open the **Demo** panel in the bottom corner.
 | Scenario `exercise` | Heart rate climbs past 130 and the card says "Exercise". No alert: effort is not an anomaly |
 | Scenario `sensor_off` | Cards show "No data". No alert: a missing reading is never shown as a good one |
 | Scenario `hypercapnia` at ×60 | Cabin CO₂ passes the 3.0 mmHg limit; the alert is for the whole crew |
-| Reset | Everything starts again from a clean history |
+| Reset | Everything starts again from a clean history. This also deletes the readings recorded from the real wristband |
 
 Other scenarios: `tachycardia_rest`, `bradycardia`, `fever_like`, `depressurization`, `motion_artifact`.
 

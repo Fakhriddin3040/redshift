@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { api, liveUrl } from "./api";
 import type { LiveMessage, Today } from "./types";
 
-const DEFAULT_CREW = Number(process.env.NEXT_PUBLIC_CREW_ID ?? 1) || 1;
+// Crew 8 is the real wristband; crew 1-7 are the virtual devices.
+const DEFAULT_CREW = Number(process.env.NEXT_PUBLIC_CREW_ID ?? 8) || 8;
 const POLL_MS = 10_000;
 
 export interface Checkin {

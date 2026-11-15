@@ -9,6 +9,8 @@
     LLM_TEMPERATURE=0.2                    (optional)
     LLM_MAX_CALLS_PER_HOUR=30              (optional, 0 = no cap)
     LLM_EXTRA_BODY='{"key": "value"}'      (optional, provider-specific request fields)
+    LLM_ASK_MAX_TOKENS=300                 (optional, token limit of an Ask Vigil answer)
+    LLM_ASK_MAX_CALLS_PER_HOUR=15          (optional, 0 = Ask Vigil off)
 
 Changing the provider or the model means changing these variables and nothing
 else. With LLM_BASE_URL or LLM_MODEL empty the LLM is off and alert text comes
@@ -40,6 +42,12 @@ class LLMSettings(BaseSettings):
     # Spending cap: at most this many requests in any 60 minutes; further alerts
     # keep their template text. 0 = no cap.
     max_calls_per_hour: int = 30
+    # Ask Vigil (questions about one's own record). Its answers are longer than an
+    # alert sentence, and it has its own smaller hourly cap so that questions can
+    # never use up the requests that alert explanations need. Its requests also
+    # count towards max_calls_per_hour. 0 = Ask Vigil is off.
+    ask_max_tokens: int = 300
+    ask_max_calls_per_hour: int = 15
 
     @property
     def enabled(self) -> bool:
