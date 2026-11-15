@@ -13,7 +13,9 @@ function liveLabel(t: Today): string {
   const d = t.device;
   if (d.link === "no_link") return "No link to wristband · showing last values";
   if (d.worn === false) return "Wristband not worn";
-  return `Live from wristband · signal ${d.signal ?? "—"} · ${ctxWord(t.ctx)}`;
+  // "off" is the state of the last full minute; the wristband may be on again by now.
+  const state = t.ctx === "off" ? "" : ` · ${ctxWord(t.ctx)}`;
+  return `Live from wristband · signal ${d.signal ?? "—"}${state}`;
 }
 
 function LearningBar({ t }: { t: Today }) {

@@ -85,6 +85,12 @@ export function VigilProvider({ children }: { children: React.ReactNode }) {
   const [checkins, setCheckins] = useState<Record<string, Checkin>>({});
   const [reports, setReports] = useState<Record<string, ReportDraft>>({});
   const refetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The cards as last rendered, for the live socket to compare a tick against.
+  const cardsRef = useRef<Today["vitals"]>([]);
+
+  useEffect(() => {
+    cardsRef.current = today ? [...today.vitals, ...today.cabin] : [];
+  }, [today]);
 
   useEffect(() => {
     // localStorage is only readable after hydration
@@ -158,6 +164,13 @@ export function VigilProvider({ children }: { children: React.ReactNode }) {
         }
         if (msg.t === "tick") {
           setLastTickAt(Date.now());
+          // A reading that appears or disappears changes the state of its card
+          // (no data, not measured, ...), and only /today knows the state: ask for
+          // it now instead of waiting for the next poll.
+          const flipped = cardsRef.current.some(
+            (c) => c.m in msg.v && (msg.v[c.m] == null) !== (c.value == null)
+          );
+          if (flipped) scheduleRefresh();
           setToday((t) => {
             if (!t) return t;
             const upd = <C extends Today["vitals"][number]>(c: C): C => {

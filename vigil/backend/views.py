@@ -51,7 +51,7 @@ def signal(sqi: float | None) -> str | None:
 
 
 def current_value(rt: CrewRuntime, m: str) -> float | None:
-    if rt.is_off and m in dict(VITALS):
+    if rt.live_off and m in dict(VITALS):
         return None
     return rt.latest("ppco2" if m == "ppco2" else FRAME_FIELD[m])
 
@@ -84,7 +84,7 @@ def card_state(rt: CrewRuntime, m: str) -> tuple[str, dict[str, Any]]:
     if current_value(rt, m) is None:
         since = [rt.dev.null_since.get(field)]
         if m in dict(VITALS):
-            since.append(rt.off_since)
+            since += [rt.off_since, rt.dev.no_signal_since]
         extra["since_ts"] = min((s for s in since if s is not None), default=None)
         return "no_data", extra
 
@@ -96,6 +96,11 @@ def card_state(rt: CrewRuntime, m: str) -> tuple[str, dict[str, Any]]:
         return LEVEL_NAMES[level], extra
     if m == "amb_t":
         return "usual", extra
+    if rt.is_off:
+        # The wristband gives a reading again, but the last minute was still `off`:
+        # no minute has judged this value yet. "learning" is the state that shows
+        # the number without a verdict; the next closed minute replaces it.
+        return "learning", extra
 
     ev = last.evals.get(m) if last else None
     if ev is not None:

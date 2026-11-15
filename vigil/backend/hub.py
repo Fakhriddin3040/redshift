@@ -87,6 +87,9 @@ class DeviceStats:
     last_frame: Frame | None = None
     seen: set[str] = field(default_factory=set)
     null_since: dict[str, int] = field(default_factory=dict)
+    # ts of the first frame of the current run of frames with no usable signal
+    # (not worn, or signal quality below OFF_SQI); None while the signal is usable.
+    no_signal_since: int | None = None
 
     def observe(self, f: Frame) -> None:
         if self.last_seq is not None:
@@ -96,6 +99,10 @@ class DeviceStats:
         self.received += 1
         self.last_wall = time.monotonic()
         self.last_frame = f
+        if f.worn and f.sqi >= th.OFF_SQI:
+            self.no_signal_since = None
+        elif self.no_signal_since is None:
+            self.no_signal_since = f.ts
         for name in MEASURED_FIELDS:
             if getattr(f, name) is None:
                 if name in self.seen:
@@ -138,7 +145,19 @@ class CrewRuntime:
 
     @property
     def is_off(self) -> bool:
+        """The last minute was `off`. This is what the pipeline judged."""
         return self.off_since is not None
+
+    @property
+    def live_off(self) -> bool:
+        """No vital sign can be shown right now. Decided by the last frame, with the
+        same two conditions that make a minute `off` (not worn, signal quality below
+        OFF_SQI), so the page follows the wristband within a second instead of
+        waiting for the minute to close. After a restart, before any frame has
+        arrived, the last stored minute decides."""
+        if self.dev.last_frame is None:
+            return self.is_off
+        return self.dev.no_signal_since is not None
 
     @property
     def now_ts(self) -> int | None:
@@ -542,7 +561,7 @@ class Hub:
         if not rt.subscribers:
             return
         last = rt.state.last
-        off = rt.is_off
+        off = rt.live_off
         self._publish(
             rt,
             {

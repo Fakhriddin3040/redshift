@@ -4,7 +4,7 @@ Crew health monitoring for long space missions, built for NASA Space Apps 2026.
 
 Each crew member wears a wristband. Vigil learns that person's own usual range for heart rate, blood oxygen, breathing and skin temperature, watches the cabin air, and raises a clear, staged alert — Watch, Alert, Critical — with the reason and the next steps, without waiting for the ground.
 
-**Prototype, not a medical device.** There is no hardware yet: a virtual device (`vdev`) streams the same 32-byte frames a wristband would send. Crew members 1–7 are virtual. Crew member 8 is reserved for one real wristband (`dev_id` 50), and the page opens as crew member 8 by default (`NEXT_PUBLIC_CREW_ID`); until that wristband sends data its page is empty.
+**Prototype, not a medical device.** A virtual device (`vdev`) streams the same 32-byte frames a wristband sends. Crew members 1–7 are virtual. Crew member 8 is one real wristband prototype ([The wristband](#the-wristband), `dev_id` 50), and the page opens as crew member 8 by default (`NEXT_PUBLIC_CREW_ID`); until that wristband sends data its page is empty.
 
 ## Run it
 
@@ -122,6 +122,23 @@ vdev  ──32-byte frames, 1 Hz──▶  backend  ──REST + WebSocket──
 
 Every formula and number: [`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md) (in Russian).
 
+## The wristband
+
+The band is a small embedded system: an ESP32-S3 with a screen and six sensors. The firmware is in [`band/`](band/) (PlatformIO, Arduino framework). Once a second it packs the readings into one 32-byte frame and sends it to the backend over a secure WebSocket; it also shows them, and its own alerts, on its screen.
+
+| Part | What it does |
+|---|---|
+| ESP32-S3 (4 MB flash, 2 MB PSRAM) | runs the firmware; Wi-Fi, clock from NTP, sends the frames; keeps up to 2 minutes of frames while offline |
+| MAX30102, optical sensor | heart rate, blood oxygen (an estimate, not calibrated), heart rate variability, signal quality |
+| MAX30205 | skin temperature |
+| SCD41 | cabin CO₂ and air temperature |
+| BMP390 | cabin pressure |
+| BMI270, motion sensor | activity level and the motion-artifact flag |
+| AD8232, one-lead ECG | ECG curve on the band's own screen and the electrode-contact flag; switched off by default (`ECG_ENABLED`) |
+| GC9A01, round display | dashboard, and a full-screen view of the reading that is out of range |
+
+Not measured: breathing rate. Battery level is not reported yet (`BATT_ENABLED`). Details: [`band/src/README.md`](band/src/README.md) (in Russian).
+
 ## Data
 
 | Source | Used for |
@@ -154,6 +171,7 @@ vigil/
   backend/    Litestar + asyncpg: ingest, live updates, REST
   vdev/       virtual device: signal generator, scenarios, NASA CO₂ profile
 client/       Next.js interface
+band/         firmware of the wristband prototype (ESP32-S3, PlatformIO)
 nginx/        reverse proxy between Traefik and the backend / client
 deploy.sh     one script for a new server: data, training, start, checks, demo incidents
 ml/           data preparation and evaluation scripts

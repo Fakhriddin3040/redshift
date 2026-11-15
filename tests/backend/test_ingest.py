@@ -1,3 +1,4 @@
+from vigil.backend import views
 from vigil.backend.hub import CrewRuntime, Hub
 from vigil.core.frame import Flag, Frame, pack
 
@@ -85,3 +86,64 @@ async def test_ack_closes_system_notice():
     assert "checkin:1970-01-01" not in rt.notices
     hub.handle_frame(frame(660, seq=1, ftype=2))
     assert not rt.notices
+
+
+def ticks_of(q) -> list[dict]:
+    return [m for m in (q.get_nowait() for _ in range(q.qsize())) if m["t"] == "tick"]
+
+
+def test_live_values_follow_each_frame_not_the_last_minute():
+    hub, _ = make_hub()
+    rt, q = hub.crews[1], hub.subscribe(1)
+
+    def send(ts: int, **kw) -> dict:
+        hub.handle_frame(frame(ts, seq=ts & 0xFF, **kw))
+        return ticks_of(q)[-1]
+
+    # One whole minute with the wristband off closes as `off`.
+    for s in range(61):
+        tick = send(600 + s, flags=0, sqi=0, hr=None, spo2=None, rr=None, skin_t=None)
+    assert rt.is_off and tick["v"]["hr"] is None and tick["worn"] is False
+
+    # Put on: the next second is shown, though the minute state is still `off`.
+    tick = send(661)
+    assert rt.is_off and not rt.live_off
+    assert tick["v"]["hr"] == 60.0 and tick["v"]["skin_t"] == 33.5 and tick["worn"]
+    card = views.card(rt, "hr")
+    assert card["value"] == 60.0
+    assert card["state"] == "learning"  # shown, but no minute has judged it yet
+
+    # Worn flag on but no usable signal: hidden again, at once.
+    tick = send(662, sqi=10, amb_t=22.0)
+    assert tick["v"]["hr"] is None and tick["v"]["skin_t"] is None
+    assert tick["v"]["amb_t"] == 22.0  # cabin readings do not depend on the wrist
+    card = views.card(rt, "hr")
+    assert card["state"] == "no_data" and card["since_ts"] == 600
+
+
+def test_taking_the_wristband_off_hides_vitals_before_the_minute_closes():
+    hub, _ = make_hub()
+    rt, q = hub.crews[1], hub.subscribe(1)
+    for s in range(70):  # a full good minute and ten seconds of the next
+        hub.handle_frame(frame(600 + s, seq=s))
+    assert not rt.is_off and ticks_of(q)[-1]["v"]["hr"] == 60.0
+
+    hub.handle_frame(frame(670, seq=70, flags=0))  # values still sent, flag off
+    assert not rt.is_off and rt.live_off
+    assert ticks_of(q)[-1]["v"]["hr"] is None
+    card = views.card(rt, "hr")
+    assert card["value"] is None and card["state"] == "no_data"
+    assert card["since_ts"] == 670
+
+    hub.handle_frame(frame(671, seq=71))
+    assert ticks_of(q)[-1]["v"]["hr"] == 60.0
+    assert views.card(rt, "hr")["state"] != "no_data"
+
+
+def test_after_a_restart_the_last_stored_minute_decides():
+    hub, _ = make_hub()
+    rt = hub.crews[1]
+    rt.off_since = 600  # restored from the database, no frame yet
+    assert rt.dev.last_frame is None and rt.live_off
+    rt.off_since = None
+    assert not rt.live_off
