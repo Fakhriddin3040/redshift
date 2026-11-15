@@ -12,3 +12,6 @@ data/
 tmp*
 backup*
 data_archives
+secrets.h
+*.log
+.idea/
