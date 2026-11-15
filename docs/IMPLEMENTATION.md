@@ -369,8 +369,9 @@ P = press_hpa, если есть, иначе 1013.25
 
 | Поле | Смысл |
 |---|---|
-| `low_act_run` | сколько минут подряд `act_mg ≤ 8` (включая текущую) |
-| `last_active_ts` | `ts` последней «активной» минуты (по движению или биту) |
+| `low_act_run` | счёт «тихих» минут для сна: от 0 до 15 (правило — в §6.3) |
+| `active_run` | сколько минут подряд `act_mg ≥ 80` (включая текущую) |
+| `last_active_ts` | `ts` последней минуты, от которой отсчитывается «остывание» |
 | `_last_ts` | `ts` предыдущей минуты — чтобы понять, идут ли минуты подряд |
 
 ### 6.3 Алгоритм `classify(m, rest_hr_median)` — по шагам
@@ -378,30 +379,34 @@ P = press_hpa, если есть, иначе 1013.25
 ```
 contiguous = (_last_ts есть) и (m.ts − _last_ts = 60)
 _last_ts = m.ts
+если не contiguous:  low_act_run = 0; active_run = 0
 
-low = (act_mg ≠ None) и (act_mg ≤ 8)
-low_act_run = 0,                       если не low
-              low_act_run + 1,         если low и contiguous
-              1,                       если low и не contiguous
+moving = (act_mg ≠ None) и (act_mg ≥ 80)
+active_run = active_run + 1, если moving; иначе 0
 
-1) OFF:    worn_frac < 0.5  или  (sqi или 0) < 20        → low_act_run = 0; вернуть OFF
-2) ACTIVE: exercise  или  act_mg ≥ 60                     → last_active_ts = m.ts; вернуть ACTIVE
-3) ACTIVE: last_active_ts есть и m.ts − last_active_ts ≤ 300   → вернуть ACTIVE   («остывание» 5 минут)
-4) SLEEP:  low_act_run ≥ 15 и (hr = None или hr ≤ R + 5)  → вернуть SLEEP
-           где R = rest_hr_median, если есть, иначе 60
+low_act_run = 0,                         если act_mg = None или moving
+              min(low_act_run + 1, 15),  если act_mg ≤ 12        («тихая» минута)
+              max(0, low_act_run − 2),   иначе                    («беспокойная» минута)
+
+1) OFF:    worn_frac < 0.5  или  (sqi или 0) < 20        → low_act_run = 0; active_run = 0; вернуть OFF
+2) ACTIVE: exercise  или  moving                          → вернуть ACTIVE;
+           если exercise или active_run ≥ 2:  last_active_ts = m.ts
+3) ACTIVE: last_active_ts есть и m.ts − last_active_ts ≤ 180   → вернуть ACTIVE   («остывание» 3 минуты)
+4) SLEEP:  low_act_run ≥ 15 и (hr = None или R = None или hr ≤ R + 10)  → вернуть SLEEP
+           где R = rest_hr_median
 5) иначе REST
 ```
 
 Пояснения к числам:
 
-- **Остывание 5 минут.** Если последняя активная минута была в 10:00, то 10:01…10:05 тоже `active` (разница 60…300 с), 10:06 — уже нет.
-- **15 минут подряд.** Минуты должны идти строго подряд (шаг 60 с). Пропуск минуты или минута `off` обнуляет счёт. Первые 14 тихих минут — `rest`, с 15-й — `sleep`.
-- **`R` — медиана пульса покоя** этого человека: берётся из объединённого буфера `hr × rest` (по всем окнам суток), если в нём ≥ 120 значений (`Baseline.rest_hr_median()`, §7.8). Иначе 60.
+- **Остывание 3 минуты, и только после настоящей нагрузки.** Остывание запускают две минуты движения подряд или бит `EXERCISE`. Одна оживлённая минута (встал, потянулся) сама считается `active`, но остывания не даёт. Если последняя такая минута была в 10:00, то 10:01…10:03 тоже `active`, 10:04 — уже нет.
+- **Счёт тихих минут.** Тихая минута (`act_mg ≤ 12`) добавляет 1, но не выше 15. Беспокойная минута (12 < `act_mg` < 80) отнимает 2. Движение (`act_mg ≥ 80`), пропуск минуты, минута без `act_mg` или минута `off` обнуляют счёт. Сон — когда счёт равен 15. Поэтому первые 14 тихих минут — `rest`, с 15-й — `sleep`; после одной беспокойной минуты сон возвращается через 2 тихие минуты, а не через 15.
+- **`R` — медиана пульса покоя** этого человека: берётся из объединённого буфера `hr × rest` (по всем окнам суток), если в нём ≥ 120 значений (`Baseline.rest_hr_median()`, §7.8). Пока её нет, условие по пульсу не применяется: сравнивать не с чем, решает движение.
 - **`hr = None` не мешает сну** (решение: активность решает).
 
 ### 6.4 Откуда берутся пороги
 
-`ACTIVE_ACT_MG = 60`, `SLEEP_ACT_MG = 8`, `SLEEP_RUN_MIN = 15`, `ACTIVE_COOLDOWN_S = 300`, `OFF_WORN_FRAC = 0.5`, `OFF_SQI = 20`, `SLEEP_HR_MARGIN = 5`, `SLEEP_DEFAULT_REST_HR = 60` — стартовые числа из §5.3, лежат в `thresholds.py`; ML уточнит по данным (C2).
+`ACTIVE_ACT_MG = 80`, `ACTIVE_COOLDOWN_S = 180`, `ACTIVE_COOLDOWN_MIN_RUN = 2`, `SLEEP_ACT_MG = 12`, `SLEEP_RUN_MIN = 15`, `SLEEP_NOISE_PENALTY = 2`, `SLEEP_HR_MARGIN = 10`, `OFF_WORN_FRAC = 0.5`, `OFF_SQI = 20` лежат в `thresholds.py`. Значения подобраны на train-субъектах PPG-DaLiA и sleep-accel (C2, C3); точность на отложенных людях и разбор — в `docs/DATA_NOTES.md` §3.
 
 ### 6.5 Кто использует контекст
 
@@ -458,7 +463,7 @@ z(x) = (x − med) / sig
 
 `1.4826 × MAD` — оценка стандартного отклонения, устойчивая к выбросам (для нормального распределения совпадает с σ).
 
-**Пол σ** (`SIGMA_FLOOR`): `hr 3.0 · spo2 1.0 · rr 1.5 · skin_t 0.3 · hrv 8.0`. Без пола у очень стабильного человека σ была бы крошечной, и любое колебание давало бы огромный z.
+**Пол σ** (`SIGMA_FLOOR`): `hr 3.0 · spo2 1.0 · rr 1.5 · skin_t 0.5 · hrv 8.0`. Без пола у очень стабильного человека σ была бы крошечной, и любое колебание давало бы огромный z.
 
 **Проверочный пример (§6.2, есть тест):**
 
@@ -1249,18 +1254,19 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 | `MMHG_PER_HPA` | 0,750062 | перевод гПа → мм рт. ст. | §5.2 |
 | `OFF_WORN_FRAC` | 0,5 | `off`, если надет меньше половины минуты | §5.3 |
 | `OFF_SQI` | 20 | `off`, если sqi < 20 | §5.3 |
-| `ACTIVE_ACT_MG` | 60 | `active` по движению | §5.3 |
-| `ACTIVE_COOLDOWN_S` | 300 | «остывание» после нагрузки | §5.3 |
-| `SLEEP_ACT_MG` | 8 | «тихая» минута | §5.3 |
-| `SLEEP_RUN_MIN` | 15 | тихих минут подряд для сна | §5.3 |
-| `SLEEP_HR_MARGIN` | 5 | пульс ≤ покой + 5 | §5.3 |
-| `SLEEP_DEFAULT_REST_HR` | 60 | покой, если нормы нет | §5.3 |
+| `ACTIVE_ACT_MG` | 80 | `active` по движению | §5.3 |
+| `ACTIVE_COOLDOWN_S` | 180 | «остывание» после нагрузки | §5.3 |
+| `ACTIVE_COOLDOWN_MIN_RUN` | 2 | минут движения подряд, чтобы включилось остывание | C3 |
+| `SLEEP_ACT_MG` | 12 | «тихая» минута | §5.3, C3 |
+| `SLEEP_RUN_MIN` | 15 | счёт тихих минут для сна | §5.3 |
+| `SLEEP_NOISE_PENALTY` | 2 | сколько отнимает беспокойная минута | C3 |
+| `SLEEP_HR_MARGIN` | 10 | пульс ≤ покой + 10 | §5.3, C3 |
 | `REST_HR_MIN_VALUES` | 120 | минимум значений для медианы покоя | решение |
 | `BASELINE_WINDOW_S` | 1 209 600 (14 сут) | окно буфера нормы, окно восстановления, учёт суток | §6.1 |
 | `CELL_READY_VALUES` | 120 | готовность ячейки | §6.3 |
 | `CELL_READY_DAYS` | 3 | готовность ячейки | §6.3 |
 | `MAD_TO_SIGMA` | 1,4826 | MAD → σ | §6.2 |
-| `SIGMA_FLOOR` | hr 3 · spo2 1 · rr 1,5 · skin_t 0,3 · hrv 8 | пол σ; база для трендов | §6.2 |
+| `SIGMA_FLOOR` | hr 3 · spo2 1 · rr 1,5 · skin_t 0,5 · hrv 8 | пол σ; база для трендов | §6.2 |
 | `BAND_SIGMAS` | 2 | коридор med ± 2σ | §6.2 |
 | `TOD_HOURS` | 4 | ширина окна суток | §6.1 |
 | `LEARN_MAX_Z` | 2,5 | порог попадания в норму после прогрева | §6.5 |
@@ -1373,20 +1379,31 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 - Счётчики `lost`/`received` устройства копятся, но пока не отдаются (нужен `/device`).
 - `MinuteResult.new_day` и `raw` наружу не используются.
 
-**Не сделано (по `TASK.md` §15):**
+**Сделано 15 ноября 2026 (после этого документа):**
+
+| ID | Что | Где |
+|---|---|---|
+| SIM-1…5 | виртуальное устройство: 7 потоков, история + живой режим, 9 сценариев, реальный CO₂ МКС | `vigil/vdev/`, `docs/TASKS.md` §2 |
+| LLM-0 | шаблонные тексты `{what, why, action}`, `text_src = "template"`; действия из `docs/actions.yaml`. Во время восстановления текст не переписывается | `vigil/backend/narrate.py`, `hub._on_minute` |
+| ML-1…4 | 40 признаков окна, XGBoost; модель называет паттерн открытого инцидента и даёт `p`. Уровень модель не поднимает (Watch от паттерна не сделан) | `vigil/core/features.py`, `vigil/core/pattern_model.py`, `ml/train_xgb.py` |
+| BE-6a | `POST /crew/{id}/checkin`, `GET /crew/{id}/sleep`, поля `record.sleep`, `record.radiation`, `record.checkin` в `/today`, `checkin_ts` и `sleep_7n_mean_min` в `/crew` | `api/routes.py`, `views.py` |
+| BE-7 | `GET /radiation` по данным NASA OSDR EDA (RR-12) | `views.radiation`, `db.seed_radiation` |
+| — | название паттерна сохраняется во время восстановления (раньше гипоксия теряла имя, тахикардия становилась «брадикардией») | `pipeline._refresh_incident` |
+| — | правило контекста переделано по данным (§6.3) | `core/context.py`, `docs/DATA_NOTES.md` §3 |
+
+Ложные тревоги на норме с новым генератором: 0 инцидентов (`docs/DATA_NOTES.md` §7).
+
+**Не сделано:**
 
 | P | ID | Что |
 |---|---|---|
-| 38 | LLM-0 | шаблонные тексты и `actions.yaml` — сейчас `text = null` |
 | 45 | SUB-1 | публичный деплой |
-| 54 | ML-4 | `core/features.py` (40 признаков), XGBoost, Watch от паттерна при p ≥ 0,8 три минуты |
-| 56 | BE-6 | суточный отчёт |
-| — | BE-6a | `/checkin`, `/device`, `/sleep`, поле `record` в `/today` |
-| 62 | LLM-3 | Ollama с проверкой и откатом |
-| 65 | BE-7 | `/radiation` |
+| 54 | ML-4 (часть) | Watch от паттерна при p ≥ 0,8 три минуты |
+| 56 | BE-6 | суточный отчёт на сервере (страница Report собирает текст в браузере) |
+| — | BE-6a (часть) | `/device` |
+| 62 | LLM-3 | Ollama с проверкой и откатом; LLM в продукте нет |
 | 83 | DET-5 | дрейф по суткам (Тейл–Сен) |
 | 92 | PR-2 | токен устройства |
-| — | §16 | сквозной скрипт в репозитории |
 
 ---
 
@@ -1406,7 +1423,7 @@ vdev недоступен (ошибка httpx, таймаут 5 с) → `503 {"d
 | | `test_cabin_ignores_sqi` | CO₂ при sqi = 0 остаётся |
 | | `test_aggregator_closes_on_next_minute` | минута закрывается кадром следующей |
 | | `test_ppco2` | 5000 ppm → 3,80 |
-| | `test_context_off`, `…active_with_cooldown`, `…exercise_flag`, `…sleep_after_15_low_minutes`, `…sleep_needs_low_hr`, `…sleep_null_hr_passes`, `…rest` | все ветви §6.3, включая 5 минут остывания |
+| | `test_context_off`, `…active_with_cooldown`, `…single_busy_minute_has_no_cooldown`, `…exercise_flag`, `…exercise_flag_starts_cooldown`, `…sleep_after_15_low_minutes`, `…sleep_needs_low_hr`, `…sleep_null_hr_passes`, `…sleep_survives_a_restless_minute`, `…movement_ends_sleep`, `…sleep_without_learned_rest_hr_ignores_hr`, `…rest` | все ветви §6.3, включая 3 минуты остывания |
 | `tests/core/test_baseline_levels.py` | `test_norm_example` | пример §6.2: med 57, σ 3, z(66) = 3 |
 | | `test_cell_not_ready_with_119_values`, `…two_days`, `test_cell_ready` | готовность ячейки |
 | | `test_lookup_falls_back_to_typical_doubled` | откат: hr/rest = 60 ± 20 |

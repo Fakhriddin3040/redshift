@@ -1,0 +1,335 @@
+{
+  "history_days": 21,
+  "live_days": 2,
+  "count_after_day": 8,
+  "target_met": true,
+  "runs": [
+    {
+      "seed": 0,
+      "counted_days_per_person": 15,
+      "incidents": 0,
+      "per_person_day": 0.0,
+      "watch": 0,
+      "alert": 0,
+      "critical": 0,
+      "per_crew": {
+        "1": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.632,
+            "sleep": 0.311
+          },
+          "examples": []
+        },
+        "2": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.63,
+            "sleep": 0.313
+          },
+          "examples": []
+        },
+        "3": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.625,
+            "sleep": 0.318
+          },
+          "examples": []
+        },
+        "4": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.628,
+            "sleep": 0.315
+          },
+          "examples": []
+        },
+        "5": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.632,
+            "sleep": 0.311
+          },
+          "examples": []
+        },
+        "6": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.629,
+            "sleep": 0.314
+          },
+          "examples": []
+        },
+        "7": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.635,
+            "sleep": 0.308
+          },
+          "examples": []
+        }
+      }
+    },
+    {
+      "seed": 1,
+      "counted_days_per_person": 15,
+      "incidents": 0,
+      "per_person_day": 0.0,
+      "watch": 0,
+      "alert": 0,
+      "critical": 0,
+      "per_crew": {
+        "1": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.628,
+            "sleep": 0.315
+          },
+          "examples": []
+        },
+        "2": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.633,
+            "sleep": 0.31
+          },
+          "examples": []
+        },
+        "3": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.629,
+            "sleep": 0.314
+          },
+          "examples": []
+        },
+        "4": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.627,
+            "sleep": 0.316
+          },
+          "examples": []
+        },
+        "5": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.629,
+            "sleep": 0.314
+          },
+          "examples": []
+        },
+        "6": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.632,
+            "sleep": 0.311
+          },
+          "examples": []
+        },
+        "7": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.634,
+            "sleep": 0.309
+          },
+          "examples": []
+        }
+      }
+    },
+    {
+      "seed": 2,
+      "counted_days_per_person": 15,
+      "incidents": 0,
+      "per_person_day": 0.0,
+      "watch": 0,
+      "alert": 0,
+      "critical": 0,
+      "per_crew": {
+        "1": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.628,
+            "sleep": 0.316
+          },
+          "examples": []
+        },
+        "2": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.628,
+            "sleep": 0.315
+          },
+          "examples": []
+        },
+        "3": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.632,
+            "sleep": 0.311
+          },
+          "examples": []
+        },
+        "4": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.629,
+            "sleep": 0.314
+          },
+          "examples": []
+        },
+        "5": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.63,
+            "sleep": 0.313
+          },
+          "examples": []
+        },
+        "6": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.63,
+            "sleep": 0.313
+          },
+          "examples": []
+        },
+        "7": {
+          "incidents": 0,
+          "per_person_day": 0.0,
+          "by_peak_level": {},
+          "by_pattern": {},
+          "live_part": 0,
+          "baseline": "learned",
+          "ctx_share": {
+            "active": 0.057,
+            "rest": 0.63,
+            "sleep": 0.313
+          },
+          "examples": []
+        }
+      }
+    }
+  ]
+}

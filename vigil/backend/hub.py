@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from vigil.backend.db import Database
+from vigil.backend.narrate import template_text
 from vigil.backend.serialize import (
     alert_json,
     alert_tuple,
@@ -20,13 +21,16 @@ from vigil.backend.serialize import (
 from vigil.backend.writer import Writer
 from vigil.core import thresholds as th
 from vigil.core.context import Ctx
+from vigil.core.features import WINDOW_MIN, features
 from vigil.core.frame import MEASURED_FIELDS, Frame, FrameError, FrameType, unpack
 from vigil.core.minute import Minute, MinuteAggregator, from_minute_frame, ppco2
-from vigil.core.pipeline import CrewState, Incident
+from vigil.core.pattern_model import PatternModel
+from vigil.core.pipeline import CrewState, Incident, MinuteResult
 
 log = logging.getLogger("vigil.hub")
 
 RECENT_MINUTES = 60
+PATTERN_MIN_P = 0.5  # below this the rule's pattern name is kept
 LIVE_TICK_BACKLOG = 256
 ROW_FIELDS = (
     "hr",
@@ -39,6 +43,32 @@ ROW_FIELDS = (
     "amb_t",
     "act_mg",
 )
+
+
+NIGHTS_WINDOW_S = 8 * 86400
+NIGHT_GAP_S = 2 * 3600  # a longer break in sleep starts a new night
+NIGHT_MIN_MINUTES = 120  # shorter runs are naps or noise, not nights
+
+
+def group_nights(sleep_ts: list[int]) -> list[dict[str, Any]]:
+    """Sleep minutes (sorted) -> nights: onset, wake, minutes asleep, minutes in between."""
+    nights: list[dict[str, Any]] = []
+    run: list[int] = []
+    for ts in [*sleep_ts, None]:
+        if ts is not None and (not run or ts - run[-1] <= NIGHT_GAP_S):
+            run.append(ts)
+            continue
+        if len(run) >= NIGHT_MIN_MINUTES:
+            nights.append(
+                {
+                    "onset_ts": run[0],
+                    "wake_ts": run[-1] + 60,
+                    "asleep_min": len(run),
+                    "awake_min": (run[-1] + 60 - run[0]) // 60 - len(run),
+                }
+            )
+        run = [] if ts is None else [ts]
+    return nights
 
 
 def day_str(day: int) -> str:
@@ -86,12 +116,16 @@ class CrewRuntime:
     recent: deque[dict[str, Any]] = field(
         default_factory=lambda: deque(maxlen=RECENT_MINUTES)
     )
+    window: deque[MinuteResult] = field(
+        default_factory=lambda: deque(maxlen=WINDOW_MIN)
+    )
     first_day: int | None = None
     data_minutes: dict[int, int] = field(default_factory=dict)
     notices: dict[str, Incident] = field(default_factory=dict)
     notice_keys: set[str] = field(default_factory=set)
     subscribers: set[asyncio.Queue] = field(default_factory=set)
     baseline_seen: tuple[str, int] | None = None
+    checkins: dict[str, int] = field(default_factory=dict)  # day -> filed_ts
     off_since: int | None = None
 
     def track_off(self, ctx: Ctx, ts: int) -> None:
@@ -135,9 +169,19 @@ class CrewRuntime:
 
 
 class Hub:
-    def __init__(self, db: Database, writer: Writer) -> None:
+    def __init__(
+        self,
+        db: Database,
+        writer: Writer,
+        actions: dict[str, dict[str, list[str]]] | None = None,
+        pattern_model: PatternModel | None = None,
+    ) -> None:
         self.db = db
         self.writer = writer
+        self.actions = actions or {}
+        self.pattern_model = pattern_model
+        self.radiation: list[dict[str, Any]] = []
+        self.sleep_cache: tuple[float, dict[int, list[dict[str, Any]]]] | None = None
         self.crews: dict[int, CrewRuntime] = {}
         self.by_dev: dict[int, CrewRuntime] = {}
         self.bad_frames = 0
@@ -172,6 +216,7 @@ class Hub:
 
     async def _restore(self, rt: CrewRuntime, open_alerts: list[Incident]) -> None:
         rt.notice_keys = await self.db.alert_keys(rt.id)
+        rt.checkins = await self.db.checkins(rt.id)
         incident = None
         for inc in open_alerts:
             if inc.key == "incident":
@@ -203,10 +248,32 @@ class Hub:
         rt.baseline_seen = (status.state, status.days)
         log.info("crew %s restored: %d minutes, baseline %s", rt.id, len(rows), status)
 
+    async def load_radiation(self) -> None:
+        await self.db.seed_radiation()
+        self.radiation = [
+            {"day": rec["day"].isoformat(), "total": r(rec["dose"], 4),
+             "gcr": r(rec["gcr"], 4), "saa": r(rec["saa"], 4)}
+            for rec in await self.db.radiation()
+        ]  # fmt: skip
+
+    async def nights(self, crew_id: int) -> list[dict[str, Any]]:
+        """Recorded nights of one crew member; one query for everyone, cached 30 s."""
+        if self.sleep_cache is None or time.monotonic() - self.sleep_cache[0] > 30:
+            latest = max((rt.now_ts or 0 for rt in self.crews.values()), default=0)
+            by_crew: dict[int, list[int]] = {}
+            for cid, ts in await self.db.sleep_minutes(latest - NIGHTS_WINDOW_S):
+                by_crew.setdefault(cid, []).append(ts)
+            self.sleep_cache = (
+                time.monotonic(),
+                {cid: group_nights(ts) for cid, ts in by_crew.items()},
+            )
+        return self.sleep_cache[1].get(crew_id, [])
+
     async def reset(self) -> None:
         async with self.writer.lock:
             self.writer.clear()
             await self.db.wipe()
+            self.sleep_cache = None
             self.bad_frames = self.unknown_frames = self.stale_frames = 0
             await self.load()
 
@@ -242,8 +309,19 @@ class Hub:
         if not f.history:
             self._tick(rt, f)
 
+    def _name_pattern(self, rt: CrewRuntime, inc: Incident) -> None:
+        """The model names the pattern of an open incident; it never raises a level.
+        If it is not loaded or sees nothing abnormal, the rule's name stays."""
+        x = features(rt.window) if self.pattern_model is not None else None
+        if x is None:
+            return
+        name, p = self.pattern_model.predict(x)
+        if name != "normal" and p >= PATTERN_MIN_P:
+            inc.pattern, inc.p = name, p
+
     def _on_minute(self, rt: CrewRuntime, m: Minute, history: bool) -> None:
         res = rt.state.on_minute(m)
+        rt.window.append(res)
         rt.track_off(res.ctx, m.ts)
         row = minute_row(rt.id, res)
         rt.recent.append(row)
@@ -260,6 +338,14 @@ class Hub:
             inc = res.incident
             if inc.id is None:
                 inc.id = self._alloc_id()
+            # Describe the incident while it is at its level; during recovery the
+            # values are back to normal and the last description must stay.
+            if res.raw >= res.level or inc.text is None:
+                if res.level > 0:
+                    self._name_pattern(rt, inc)
+                text = template_text(inc, self.actions)
+                if text is not None:
+                    inc.text, inc.text_src = text, "template"
             self.writer.alert(alert_tuple(rt.id, inc))
             if not history and (
                 res.incident_event != "updated" or res.level != res.prev_level
@@ -320,6 +406,19 @@ class Hub:
         notice.ts_end = notice.ts_update = ts
         self.writer.alert(alert_tuple(rt.id, notice))
         self._publish(rt, {"t": "alert", "alert": alert_json(rt.id, notice)})
+
+    async def file_checkin(
+        self, rt: CrewRuntime, body: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Store today's check-in (on the crew member's own clock) and close its reminder."""
+        ts = rt.now_ts
+        day = day_str(ts // 86400)
+        await self.db.save_checkin(
+            rt.id, datetime.fromtimestamp(ts, UTC).date(), body, ts
+        )
+        rt.checkins[day] = ts
+        self.close_notice(rt, f"checkin:{day}", ts)
+        return {"day": day, "filed_ts": ts}
 
     def _alloc_id(self) -> int:
         alert_id = self._next_alert_id

@@ -40,13 +40,20 @@ Raw folder names are long. Don't rename them. Put all paths in one place, `ml/pa
 
 ```python
 from pathlib import Path
+
 DATA = Path(__file__).resolve().parents[1] / "data"
 DALIA = DATA / "ppg+dalia/data/PPG_FieldStudy"
-BIDMC = DATA / "bidmc-ppg-and-respiration-dataset-1.0.0/bidmc-ppg-and-respiration-dataset-1.0.0/bidmc_csv"
-SLEEP = DATA / "sleep-accel-1.0.0/motion-and-heart-rate-from-a-wrist-worn-wearable-and-labeled-sleep-from-polysomnography-1.0.0"
+BIDMC = (
+    DATA
+    / "bidmc-ppg-and-respiration-dataset-1.0.0/bidmc-ppg-and-respiration-dataset-1.0.0/bidmc_csv"
+)
+SLEEP = (
+    DATA
+    / "sleep-accel-1.0.0/motion-and-heart-rate-from-a-wrist-worn-wearable-and-labeled-sleep-from-polysomnography-1.0.0"
+)
 EDA = DATA / "eda"
 RADLAB = DATA / "radlab"
-TRACKS = DATA / "tracks"     # processed output
+TRACKS = DATA / "tracks"  # processed output
 ```
 
 ML dependencies (dev group, not the backend image): `uv add --group ml numpy pandas pyarrow`. Add `xgboost` later, for ML-3.
@@ -275,7 +282,7 @@ Steps:
 4. **Caveat:** BIDMC SpO₂ and RESP are **integers**. Quantization in 1 % / 1 breath steps distorts both φ and σ_ε. Note this in `DATA_NOTES.md`. If the result looks unreasonable (for example σ_ε ≈ 0 with φ ≈ 1), keep the PLAN §8.1 constants: SpO₂ φ=0.98, σ_ε=0.15; RR φ=0.95, σ_ε=0.4.
 5. Optional check: regress RESP on HR across records, to compare with our coupling `μ_rr = rr_rest + 0.08·(hr − hr_rest)` [param]. These are ICU patients, so treat the result as a sanity check, not a calibration.
 
-The output is a small JSON (`ml/out/ar1.json`). Its values go into the vdev generator constants.
+The output is a small JSON (`ml/out/ar1.json`). Its values go into the vdev generator constants. **Decided 2026-11-15:** use the fitted values, SpO₂ φ=0.92, σ_ε=0.21; RR φ=0.96, σ_ε=0.32 (`chosen_for_vdev` in the JSON; reasons in `DATA_NOTES.md` §4).
 
 ---
 
@@ -386,10 +393,10 @@ Keep the download URLs in `docs/DATA_LICENSES.md` so anyone can rebuild everythi
 ### Done-checklist
 
 - [x] `data/eda/` has CO₂ JSON for 5 missions + `SOURCE.txt` (ppm, 5-min step, ISS)
-- [ ] `vigil/backend/seed/radiation_daily.csv` exists, and its unit is confirmed
-- [ ] 15 DaLiA tracks + IBI files; one subject checked by eye
+- [x] `vigil/backend/seed/radiation_daily.csv` exists, and its unit is confirmed (EDA, mGy/day)
+- [x] 15 DaLiA tracks + IBI files; one subject checked by eye
 - [ ] `ml/manifest.json` committed
-- [ ] `docs/DATA_NOTES.md` has C1–C5 with scripts and subject lists
-- [ ] `thresholds.py` updated from C2/C5, with the change noted in `DATA_NOTES.md`
-- [ ] sleep tracks + coverage exclusions
-- [ ] `docs/DATA_LICENSES.md` complete for D1–D5
+- [x] `docs/DATA_NOTES.md` has C1–C5 with scripts and subject lists
+- [x] `thresholds.py` updated from C2/C5, with the change noted in `DATA_NOTES.md`
+- [x] sleep tracks + coverage exclusions
+- [ ] `docs/DATA_LICENSES.md` complete for D1–D5 (written; citations still to be checked against the landing pages)

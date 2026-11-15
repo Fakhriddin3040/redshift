@@ -89,7 +89,7 @@ export interface Today {
   device: DeviceBrief;
   vitals: Card[];
   cabin: Card[];
-  record: { checkin: unknown; sleep: unknown; radiation: unknown; report: unknown };
+  record: { checkin: unknown; sleep: Night | null; radiation: (RadiationDay & { unit: string }) | null; report: unknown };
   notices: Alert[];
 }
 
@@ -156,3 +156,38 @@ export type LiveMessage =
   | { t: "alert"; alert: Alert }
   | { t: "level"; level: Level; critical_acked: boolean }
   | { t: "baseline"; state: Baseline["state"]; day: number; of: number };
+
+/** One recorded night, from minutes the context rule classified as sleep. */
+export interface Night {
+  onset_ts: number;
+  wake_ts: number;
+  asleep_min: number;
+  awake_min: number;
+}
+
+export interface SleepResponse {
+  shared: boolean;
+  now_ts?: number | null;
+  asleep_now: boolean;
+  nights: Night[];
+  mean_7n_min: number | null;
+}
+
+export interface RadiationDay {
+  day: string; // YYYY-MM-DD
+  total: number;
+  gcr: number | null;
+  saa: number | null;
+}
+
+/** Real ISS dose from NASA OSDR (measured in 2019), absorbed dose in mGy/day. */
+export interface RadiationResponse {
+  unit: string;
+  source: string;
+  measured_from: string | null;
+  measured_to: string | null;
+  days: RadiationDay[];
+  last_24h: number | null;
+  mean_14d: number | null;
+  total_14d: number | null;
+}

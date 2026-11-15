@@ -7,15 +7,16 @@ HARD_MIN_VALID_SECONDS = 40
 STD_PRESSURE_HPA = 1013.25
 MMHG_PER_HPA = 0.750062
 
-# Context (§5.3)
+# Context (§5.3). Values fitted on train subjects, see docs/DATA_NOTES.md §3.
 OFF_WORN_FRAC = 0.5
 OFF_SQI = 20
-ACTIVE_ACT_MG = 60
-ACTIVE_COOLDOWN_S = 5 * 60
-SLEEP_ACT_MG = 8
+ACTIVE_ACT_MG = 80  # C2: equal-error point rest vs active, DaLiA train
+ACTIVE_COOLDOWN_S = 3 * 60
+ACTIVE_COOLDOWN_MIN_RUN = 2  # moving minutes in a row before the cooldown applies
+SLEEP_ACT_MG = 12
 SLEEP_RUN_MIN = 15
-SLEEP_HR_MARGIN = 5
-SLEEP_DEFAULT_REST_HR = 60
+SLEEP_NOISE_PENALTY = 2  # a restless minute takes this much off the quiet-minute score
+SLEEP_HR_MARGIN = 10
 REST_HR_MIN_VALUES = 120
 
 # Baseline (§6)
@@ -23,7 +24,8 @@ BASELINE_WINDOW_S = 14 * 86400
 CELL_READY_VALUES = 120
 CELL_READY_DAYS = 3
 MAD_TO_SIGMA = 1.4826
-SIGMA_FLOOR = {"hr": 3.0, "spo2": 1.0, "rr": 1.5, "skin_t": 0.3, "hrv": 8.0}
+# C5 (docs/DATA_NOTES.md): hr confirmed, skin_t raised 0.3 -> 0.5, hrv kept (see notes).
+SIGMA_FLOOR = {"hr": 3.0, "spo2": 1.0, "rr": 1.5, "skin_t": 0.5, "hrv": 8.0}
 BAND_SIGMAS = 2.0
 TOD_HOURS = 4
 LEARN_MAX_Z = 2.5

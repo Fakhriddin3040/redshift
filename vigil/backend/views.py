@@ -1,5 +1,6 @@
 import time
 from collections import Counter
+from datetime import UTC, datetime
 from statistics import median
 from typing import Any
 
@@ -170,8 +171,62 @@ def flight_day(rt: CrewRuntime) -> int | None:
     return rt.now_ts // 86400 - rt.first_day + 1
 
 
-def today(rt: CrewRuntime) -> dict[str, Any]:
+RADIATION_SOURCE = "NASA OSDR Environmental Data App"
+RADIATION_DAYS = 14
+
+
+def radiation(days: list[dict[str, Any]]) -> dict[str, Any]:
+    """Real ISS dose, measured in 2019. Never presented as today's value."""
+    last = days[-RADIATION_DAYS:]
+    totals = [d["total"] for d in last]
+    span = f", RR-12, {days[0]['day']} to {days[-1]['day']}" if days else ""
+    return {
+        "unit": "mGy/day",
+        "source": RADIATION_SOURCE + span,
+        "measured_from": days[0]["day"] if days else None,
+        "measured_to": days[-1]["day"] if days else None,
+        "days": last,
+        "last_24h": r(totals[-1], 3) if totals else None,
+        "mean_14d": r(sum(totals) / len(totals), 3) if totals else None,
+        "total_14d": r(sum(totals), 3) if totals else None,
+    }
+
+
+def sleep(rt: CrewRuntime, nights: list[dict[str, Any]]) -> dict[str, Any]:
+    if not rt.share.get("sleep", True):
+        return {"shared": False, "nights": [], "mean_7n_min": None, "asleep_now": False}
+    asleep_now = current_ctx(rt) == Ctx.SLEEP
+    # A night still in progress is not a recorded night yet.
+    done = [n for n in nights if not asleep_now or n is not nights[-1]][-7:]
+    return {
+        "shared": True,
+        "now_ts": rt.now_ts,
+        "asleep_now": asleep_now,
+        "nights": done,
+        "mean_7n_min": sleep_mean(done),
+    }
+
+
+def sleep_mean(nights: list[dict[str, Any]]) -> int | None:
+    last = nights[-7:]
+    return round(sum(n["asleep_min"] for n in last) / len(last)) if last else None
+
+
+def checkin_today(rt: CrewRuntime) -> int | None:
+    if rt.now_ts is None:
+        return None
+    day = datetime.fromtimestamp(rt.now_ts, UTC).date().isoformat()
+    return rt.checkins.get(day)
+
+
+def today(
+    rt: CrewRuntime,
+    nights: list[dict[str, Any]] | None = None,
+    radiation_days: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     ctx = current_ctx(rt)
+    last_night = nights[-1] if nights and rt.share.get("sleep", True) else None
+    last_dose = radiation_days[-1] if radiation_days else None
     return {
         "now_ts": rt.now_ts,
         "flight_day": flight_day(rt),
@@ -182,7 +237,12 @@ def today(rt: CrewRuntime) -> dict[str, Any]:
         "device": device_brief(rt),
         "vitals": [card(rt, m) for m, _ in VITALS],
         "cabin": [card(rt, m) for m, _ in CABIN],
-        "record": {"checkin": None, "sleep": None, "radiation": None, "report": None},
+        "record": {
+            "checkin": checkin_today(rt) and {"filed_ts": checkin_today(rt)},
+            "sleep": last_night,
+            "radiation": last_dose and {**last_dose, "unit": "mGy/day"},
+            "report": None,
+        },
         "notices": [alert_json(rt.id, n) for n in rt.open_alerts],
     }
 
@@ -198,7 +258,9 @@ def data_today_pct(rt: CrewRuntime) -> int | None:
     return min(100, round(100 * minutes / elapsed))
 
 
-def crew_item(rt: CrewRuntime) -> dict[str, Any]:
+def crew_item(
+    rt: CrewRuntime, nights: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     pct = data_today_pct(rt)
     inc = rt.state.incident
     topic = TOPIC.get(inc.primary, inc.primary) if inc and inc.primary else None
@@ -210,8 +272,12 @@ def crew_item(rt: CrewRuntime) -> dict[str, Any]:
         "level": rt.state.level if pct is not None else None,
         "topic": topic,
         "baseline": baseline_json(rt, with_pct=False),
-        "checkin_ts": None if rt.share.get("checkin", True) else "not_shared",
-        "sleep_7n_mean_min": None if rt.share.get("sleep", True) else "not_shared",
+        "checkin_ts": checkin_today(rt)
+        if rt.share.get("checkin", True)
+        else "not_shared",
+        "sleep_7n_mean_min": sleep_mean(nights or [])
+        if rt.share.get("sleep", True)
+        else "not_shared",
         "data_today_pct": pct,
     }
 

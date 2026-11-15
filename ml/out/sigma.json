@@ -1,0 +1,147 @@
+{
+  "current_floor": {
+    "hr": 3.0,
+    "skin_t": 0.3,
+    "hrv": 8.0
+  },
+  "min_minutes_per_cell": 10,
+  "cells": {
+    "hr/active": {
+      "n_subjects": 10,
+      "p25": 10.17,
+      "p50": 15.19,
+      "p75": 16.74,
+      "per_subject": {
+        "dalia:S2": 9.224,
+        "dalia:S4": 16.431,
+        "dalia:S5": 14.669,
+        "dalia:S6": 19.088,
+        "dalia:S7": 9.161,
+        "dalia:S8": 7.968,
+        "dalia:S9": 18.448,
+        "dalia:S11": 16.846,
+        "dalia:S13": 15.72,
+        "dalia:S15": 13.022
+      }
+    },
+    "hr/rest": {
+      "n_subjects": 10,
+      "p25": 4.77,
+      "p50": 6.1,
+      "p75": 8.91,
+      "per_subject": {
+        "dalia:S2": 2.208,
+        "dalia:S4": 4.56,
+        "dalia:S5": 6.554,
+        "dalia:S6": 11.777,
+        "dalia:S7": 5.394,
+        "dalia:S8": 7.2,
+        "dalia:S9": 5.642,
+        "dalia:S11": 11.693,
+        "dalia:S13": 9.474,
+        "dalia:S15": 4.321
+      }
+    },
+    "hr/sleep": {
+      "n_subjects": 21,
+      "p25": 2.96,
+      "p50": 2.96,
+      "p75": 4.45,
+      "per_subject": {
+        "sleep:46343": 5.93,
+        "sleep:759667": 3.706,
+        "sleep:781756": 1.483,
+        "sleep:844359": 4.448,
+        "sleep:1360686": 4.448,
+        "sleep:1449548": 2.965,
+        "sleep:1455390": 2.965,
+        "sleep:1818471": 2.965,
+        "sleep:2598705": 1.483,
+        "sleep:2638030": 2.965,
+        "sleep:3509524": 2.965,
+        "sleep:3997827": 2.965,
+        "sleep:4314139": 5.93,
+        "sleep:4426783": 2.965,
+        "sleep:5132496": 5.93,
+        "sleep:5383425": 5.93,
+        "sleep:5498603": 3.336,
+        "sleep:5797046": 2.965,
+        "sleep:8173033": 2.965,
+        "sleep:8686948": 2.965,
+        "sleep:9618981": 2.965
+      }
+    },
+    "hrv/active": {
+      "n_subjects": 10,
+      "p25": 4.39,
+      "p50": 4.92,
+      "p75": 6.0,
+      "per_subject": {
+        "dalia:S2": 5.121,
+        "dalia:S4": 6.294,
+        "dalia:S5": 0.766,
+        "dalia:S6": 3.682,
+        "dalia:S7": 10.093,
+        "dalia:S8": 4.768,
+        "dalia:S9": 4.954,
+        "dalia:S11": 4.261,
+        "dalia:S13": 13.078,
+        "dalia:S15": 4.893
+      }
+    },
+    "hrv/rest": {
+      "n_subjects": 10,
+      "p25": 3.59,
+      "p50": 7.59,
+      "p75": 8.9,
+      "per_subject": {
+        "dalia:S2": 8.216,
+        "dalia:S4": 3.236,
+        "dalia:S5": 2.089,
+        "dalia:S6": 1.796,
+        "dalia:S7": 7.903,
+        "dalia:S8": 9.123,
+        "dalia:S9": 4.669,
+        "dalia:S11": 11.136,
+        "dalia:S13": 9.654,
+        "dalia:S15": 7.283
+      }
+    },
+    "skin_t/active": {
+      "n_subjects": 10,
+      "p25": 0.78,
+      "p50": 0.94,
+      "p75": 1.19,
+      "per_subject": {
+        "dalia:S2": 4.159,
+        "dalia:S4": 0.993,
+        "dalia:S5": 0.771,
+        "dalia:S6": 1.03,
+        "dalia:S7": 2.535,
+        "dalia:S8": 0.815,
+        "dalia:S9": 0.89,
+        "dalia:S11": 0.608,
+        "dalia:S13": 1.245,
+        "dalia:S15": 0.652
+      }
+    },
+    "skin_t/rest": {
+      "n_subjects": 10,
+      "p25": 0.51,
+      "p50": 0.66,
+      "p75": 0.77,
+      "per_subject": {
+        "dalia:S2": 0.726,
+        "dalia:S4": 0.632,
+        "dalia:S5": 0.493,
+        "dalia:S6": 1.408,
+        "dalia:S7": 0.578,
+        "dalia:S8": 1.749,
+        "dalia:S9": 0.786,
+        "dalia:S11": 0.682,
+        "dalia:S13": 0.415,
+        "dalia:S15": 0.237
+      }
+    }
+  }
+}

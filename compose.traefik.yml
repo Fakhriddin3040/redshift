@@ -1,0 +1,61 @@
+# Server overlay: nginx in front of the backend and the client, published through
+# Traefik on the Docker network `traefik`. Normally started by ./deploy.sh.
+#
+#   docker compose -f compose.yml -f compose.traefik.yml up -d --build
+#
+# The Traefik instance itself is either one that already runs on the server
+# (TRAEFIK_MODE=external) or the one in compose.traefik-own.yml (TRAEFIK_MODE=own).
+#
+# Reads from .env:
+#   DOMAIN_URL             public host name, e.g. vigil.example.org
+#   COMPOSE_PROJECT_NAME   project name; also the Traefik router name
+#
+# Traefik (HTTPS) -> nginx (HTTP, port 80) -> backend for /api/*, client for the rest.
+# nginx is the only service on the `traefik` network and no port is published on
+# the host. Plain `docker compose up` (compose.yml alone) needs none of this.
+
+services:
+  nginx:
+    build:
+      context: nginx
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+      client:
+        condition: service_started
+    networks:
+      - net
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`${DOMAIN_URL}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=web,websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    ports: !reset []
+
+  client:
+    build:
+      args:
+        # Baked into the browser bundle: the public address, through Traefik.
+        # PUBLIC_API_URL overrides it, e.g. when HTTPS is not on port 443.
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-https://${DOMAIN_URL}/api/v1}
+    ports: !reset []
+
+  # Not reachable from outside on a server.
+  postgres:
+    ports: !reset []
+
+networks:
+  traefik:
+    name: traefik
+    external: true

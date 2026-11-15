@@ -34,6 +34,10 @@ export function lede(today: Today): string {
   const inc = incidentOf(today);
   const open = today.notices.filter((n) => n.ack_ts == null).length;
   const primary = inc?.primary;
+  // The server's sentence describes the incident at its worst and stays true during recovery.
+  if (today.level >= 1 && inc?.text?.what) {
+    return `${String(inc.text.what)}.${today.level === 3 ? " Follow the steps from the alert." : ""}`;
+  }
   if (today.level >= 2 && primary) {
     const am = inc!.metrics.find((x) => x.m === primary);
     if (primary === "ppco2") return "Cabin CO₂ is above the 3.0 mmHg limit. Follow the crew procedure for high CO₂.";

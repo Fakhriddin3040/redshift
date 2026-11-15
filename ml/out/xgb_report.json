@@ -1,0 +1,221 @@
+{
+  "train_windows": 77479,
+  "valid_windows": 8545,
+  "test_windows": 41645,
+  "train_people": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "test_people": [
+    6,
+    7,
+    8,
+    9
+  ],
+  "rounds": 101,
+  "params": {
+    "objective": "multi:softprob",
+    "num_class": 8,
+    "max_depth": 5,
+    "eta": 0.1,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "eval_metric": "mlogloss",
+    "seed": 2026
+  },
+  "accuracy": 0.9933,
+  "macro_f1": 0.9925,
+  "accuracy_when_level_above_0": 0.9966,
+  "windows_with_level_above_0": 22661,
+  "per_class": {
+    "normal": {
+      "recall": 0.9971,
+      "precision": 0.986,
+      "f1": 0.9915,
+      "n": 16411
+    },
+    "hypoxia": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "n": 2748
+    },
+    "tachycardia_rest": {
+      "recall": 0.9966,
+      "precision": 1.0,
+      "f1": 0.9983,
+      "n": 2967
+    },
+    "bradycardia": {
+      "recall": 0.9231,
+      "precision": 0.9857,
+      "f1": 0.9534,
+      "n": 2692
+    },
+    "fever_like": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "n": 4912
+    },
+    "hypercapnia": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "n": 6011
+    },
+    "depressurization": {
+      "recall": 0.996,
+      "precision": 0.997,
+      "f1": 0.9965,
+      "n": 3978
+    },
+    "sensor_artifact": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "n": 1926
+    }
+  },
+  "confusion_rows_true_cols_pred": {
+    "classes": [
+      "normal",
+      "hypoxia",
+      "tachycardia_rest",
+      "bradycardia",
+      "fever_like",
+      "hypercapnia",
+      "depressurization",
+      "sensor_artifact"
+    ],
+    "matrix": [
+      [
+        16363,
+        0,
+        0,
+        36,
+        0,
+        0,
+        12,
+        0
+      ],
+      [
+        0,
+        2748,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        10,
+        0,
+        2957,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        207,
+        0,
+        0,
+        2485,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        4912,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        6011,
+        0,
+        0
+      ],
+      [
+        16,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3962,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1926
+      ]
+    ]
+  },
+  "top_features_by_gain": [
+    [
+      "hr_z_valid",
+      819.9
+    ],
+    [
+      "rr_z_valid",
+      551.1
+    ],
+    [
+      "spo2_z_min",
+      479.5
+    ],
+    [
+      "ppco2_mean",
+      369.5
+    ],
+    [
+      "skin_t_z_max",
+      363.4
+    ],
+    [
+      "skin_t_z_mean",
+      357.1
+    ],
+    [
+      "hr_z_max",
+      311.9
+    ],
+    [
+      "press_dev",
+      206.5
+    ],
+    [
+      "skin_t_z_valid",
+      192.2
+    ],
+    [
+      "press_slope",
+      172.5
+    ]
+  ],
+  "export_max_margin_diff": 2.99424962157957e-06,
+  "model_bytes": 329989
+}

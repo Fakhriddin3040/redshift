@@ -1,5 +1,6 @@
+import csv
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from importlib.resources import files
 from typing import Any
 
@@ -17,6 +18,8 @@ ALERT_COLUMNS = (
     "id", "crew_id", "key", "source", "ts_start", "ts_update", "ts_end",
     "level", "peak_level", "pattern", "p", "ctx", "metrics", "text", "text_src", "ack_ts",
 )  # fmt: skip
+
+RADIATION_INSTRUMENT = "NASA OSDR Environmental Data App, RR-12"
 
 METRIC_COLUMNS = {
     "hr": ("hr", "lo_hr", "hi_hr"),
@@ -166,6 +169,58 @@ class Database:
 
     async def write_alert(self, conn: asyncpg.Connection, row: tuple) -> None:
         await conn.execute(ALERT_UPSERT, *row)
+
+    async def seed_radiation(self) -> None:
+        """NASA OSDR EDA daily dose (RR-12). Loaded once; /sim/reset keeps it."""
+        if await self.pool.fetchval("select count(*) from radiation_daily"):
+            return
+        text = files("vigil.backend").joinpath("seed/radiation_daily.csv").read_text()
+        rows = [
+            (date.fromisoformat(r["day"]), float(r["total"]), "mGy/day",
+             RADIATION_INSTRUMENT, float(r["gcr"]), float(r["saa"]))
+            for r in csv.DictReader(text.splitlines())
+        ]  # fmt: skip
+        await self.pool.executemany(
+            "insert into radiation_daily (day, dose, unit, instrument, gcr, saa)"
+            " values ($1, $2, $3, $4, $5, $6) on conflict (day) do nothing",
+            rows,
+        )
+
+    async def radiation(self) -> list[asyncpg.Record]:
+        return await self.pool.fetch("select * from radiation_daily order by day")
+
+    async def sleep_minutes(
+        self, since_ts: int, crew_id: int | None = None
+    ) -> list[tuple[int, int]]:
+        """(crew_id, ts) of every minute classified as sleep after since_ts."""
+        rows = await self.pool.fetch(
+            """select crew_id, ts from agg_1m
+               where ctx = 1 and ts > $1 and ($2::smallint is null or crew_id = $2)
+               order by crew_id, ts""",
+            to_dt(since_ts),
+            crew_id,
+        )
+        return [(r["crew_id"], to_ts(r["ts"])) for r in rows]
+
+    async def save_checkin(
+        self, crew_id: int, day: date, body: dict[str, Any], filed_ts: int
+    ) -> None:
+        await self.pool.execute(
+            """insert into checkin (crew_id, day, sleep_q, mood, energy, symptoms, note, filed_ts)
+               values ($1, $2, $3, $4, $5, $6, $7, $8)
+               on conflict (crew_id, day) do update set
+                 sleep_q = excluded.sleep_q, mood = excluded.mood, energy = excluded.energy,
+                 symptoms = excluded.symptoms, note = excluded.note, filed_ts = excluded.filed_ts""",
+            crew_id, day, body["sleep"], body["mood"], body["energy"],
+            body["symptoms"], body["note"], to_dt(filed_ts),
+        )  # fmt: skip
+
+    async def checkins(self, crew_id: int) -> dict[str, int]:
+        """day (YYYY-MM-DD) -> filed_ts for one crew member."""
+        rows = await self.pool.fetch(
+            "select day, filed_ts from checkin where crew_id = $1", crew_id
+        )
+        return {r["day"].isoformat(): to_ts(r["filed_ts"]) for r in rows}
 
     async def wipe(self) -> None:
         await self.pool.execute(

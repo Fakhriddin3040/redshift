@@ -63,6 +63,10 @@ create table if not exists radiation_daily (
   dose real not null, unit text not null, instrument text not null
 );
 
+-- `create table if not exists` does not change an existing table, hence `alter`.
+alter table radiation_daily add column if not exists gcr real;
+alter table radiation_daily add column if not exists saa real;
+
 insert into crew (id, name, role, dev_id) values
   (1, 'M. Lindqvist', 'Flight Engineer', 1),
   (2, 'T. Herrera', 'Commander', 2),

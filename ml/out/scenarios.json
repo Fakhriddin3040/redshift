@@ -1,0 +1,2571 @@
+[
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 7,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 11,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypoxia",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 5,
+   "2": 8,
+   "3": 12
+  },
+  "pattern": "hypoxia",
+  "primary": "spo2",
+  "duration_min": 17,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "exercise",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 5,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "sensor_off",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 3
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "tachycardia_rest",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "tachycardia_rest",
+  "primary": "hr",
+  "duration_min": 8,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 28
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "1": 15,
+   "2": 49
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "hypercapnia",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "1": 7,
+   "2": 21,
+   "3": 51
+  },
+  "pattern": "hypercapnia",
+  "primary": "ppco2",
+  "duration_min": 70,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 5
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "depressurization",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "2": 3,
+   "3": 9
+  },
+  "pattern": "depressurization",
+  "primary": "press",
+  "duration_min": 20,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 5
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 3
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "bradycardia",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 3,
+  "first_minute_at_level": {
+   "3": 1
+  },
+  "pattern": "bradycardia",
+  "primary": "hr",
+  "duration_min": 10,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 10
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 10
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 9
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 9
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 9
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 9
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 1,
+  "first_minute_at_level": {
+   "1": 9
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 8
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 8
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 7
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 7
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 7
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 7
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 8
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "fever_like",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 2,
+  "first_minute_at_level": {
+   "2": 6
+  },
+  "pattern": "fever_like",
+  "primary": "skin_t",
+  "duration_min": 25,
+  "back_to_usual_min": 151,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 1,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 2,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 1,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 2,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 3,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 4,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 5,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 6,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ },
+ {
+  "scenario": "motion_artifact",
+  "severity": 3,
+  "crew": 7,
+  "peak_level": 0,
+  "first_minute_at_level": {},
+  "pattern": null,
+  "primary": null,
+  "duration_min": 3,
+  "back_to_usual_min": null,
+  "off_minutes": 0
+ }
+]

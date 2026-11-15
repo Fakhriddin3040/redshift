@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Notices } from "@/components/Notices";
 import { VitalCard } from "@/components/VitalCard";
-import { ctxWord, greeting, hhmm, longDate } from "@/lib/format";
+import { ctxWord, greeting, hhmm, longDate, minutes } from "@/lib/format";
 import { useVigil } from "@/lib/store";
 import { lede } from "@/lib/text";
 import type { Today } from "@/lib/types";
@@ -41,14 +41,24 @@ export default function TodayPage() {
       n: checkin ? `Sleep ${checkin.sleep} · mood ${checkin.mood} · energy ${checkin.energy}` : "About one minute",
       href: "/checkin",
     },
-    { k: "Sleep", v: "No nights recorded yet", n: "", href: "/sleep" },
+    {
+      k: "Sleep",
+      v: today.record.sleep ? `${minutes(today.record.sleep.asleep_min)} last night` : "No nights recorded yet",
+      n: today.record.sleep ? `${hhmm(today.record.sleep.onset_ts)}–${hhmm(today.record.sleep.wake_ts)}` : "",
+      href: "/sleep",
+    },
     {
       k: "Baseline",
       v: today.baseline.state === "learned" ? "Learned" : "Learning",
       n: today.baseline.state === "learned" ? `${today.baseline.ready_pct ?? 100} % of cells ready` : `Day ${today.baseline.day} of ${today.baseline.of}`,
       href: null,
     },
-    { k: "Radiation", v: "No station data yet", n: "NASA OSDR RadLab", href: "/radiation" },
+    {
+      k: "Radiation",
+      v: today.record.radiation ? `${today.record.radiation.total.toFixed(2)} mGy/day` : "No station data yet",
+      n: today.record.radiation ? "ISS, measured 2019 · NASA OSDR" : "NASA OSDR Environmental Data App",
+      href: "/radiation",
+    },
     { k: "Report", v: report.queued ? "Queued for next signal" : "Not yet sent", n: "", href: "/report" },
   ];
 

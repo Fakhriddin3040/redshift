@@ -57,9 +57,22 @@ def test_context_off():
 def test_context_active_with_cooldown():
     tr = ContextTracker()
     assert tr.classify(minute(0, act=80)) == Ctx.ACTIVE
-    for i in range(1, 6):
+    assert tr.classify(minute(60, act=80)) == Ctx.ACTIVE
+    for i in range(2, 5):
         assert tr.classify(minute(i * 60)) == Ctx.ACTIVE
-    assert tr.classify(minute(6 * 60)) == Ctx.REST
+    assert tr.classify(minute(5 * 60)) == Ctx.REST
+
+
+def test_context_single_busy_minute_has_no_cooldown():
+    tr = ContextTracker()
+    assert tr.classify(minute(0, act=80)) == Ctx.ACTIVE
+    assert tr.classify(minute(60)) == Ctx.REST
+
+
+def test_context_exercise_flag_starts_cooldown():
+    tr = ContextTracker()
+    assert tr.classify(minute(0, act=5, exercise=True)) == Ctx.ACTIVE
+    assert tr.classify(minute(60)) == Ctx.ACTIVE
 
 
 def test_context_exercise_flag():
@@ -89,3 +102,27 @@ def test_context_sleep_null_hr_passes():
 
 def test_context_rest():
     assert ContextTracker().classify(minute(0, act=20)) == Ctx.REST
+
+
+def test_context_sleep_survives_a_restless_minute():
+    tr = ContextTracker()
+    acts = [3] * 15 + [30] + [3] * 3
+    ctxs = [tr.classify(minute(i * 60, act=a, hr=55)) for i, a in enumerate(acts)]
+    assert ctxs[14] == Ctx.SLEEP
+    assert ctxs[15] == Ctx.REST  # the restless minute itself
+    assert ctxs[16] == Ctx.REST
+    assert ctxs[17] == Ctx.SLEEP  # back after two quiet minutes, not fifteen
+
+
+def test_context_movement_ends_sleep():
+    tr = ContextTracker()
+    acts = [3] * 15 + [90] + [3] * 14
+    ctxs = [tr.classify(minute(i * 60, act=a, hr=55)) for i, a in enumerate(acts)]
+    assert ctxs[14] == Ctx.SLEEP
+    assert Ctx.SLEEP not in ctxs[15:]
+
+
+def test_context_sleep_without_learned_rest_hr_ignores_hr():
+    tr = ContextTracker()
+    ctxs = [tr.classify(minute(i * 60, act=3, hr=85)) for i in range(15)]
+    assert ctxs[-1] == Ctx.SLEEP

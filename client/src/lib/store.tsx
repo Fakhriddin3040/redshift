@@ -223,11 +223,16 @@ export function VigilProvider({ children }: { children: React.ReactNode }) {
         writeLocal(`vigil.checkin.${crewId}`, next);
         return next;
       });
-      // filing closes today's check-in reminder
-      const reminder = today?.notices.find((n) => n.key === `checkin:${dayKey}` && n.ack_ts == null);
-      if (reminder) void ack(reminder.id);
+      // The server stores it, shows it on the Crew page and closes today's reminder.
+      // If the server is unreachable the entry stays in this browser and the reminder is acknowledged here.
+      api.checkin(crewId, c)
+        .then(() => refresh())
+        .catch(() => {
+          const reminder = today?.notices.find((n) => n.key === `checkin:${dayKey}` && n.ack_ts == null);
+          if (reminder) void ack(reminder.id);
+        });
     },
-    [dayKey, today, crewId, ack]
+    [dayKey, today, crewId, ack, refresh]
   );
 
   const report = (dayKey && reports[dayKey]) || DEFAULT_REPORT;

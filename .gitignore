@@ -11,3 +11,4 @@ data/
 .idea/
 tmp*
 backup*
+data_archives/

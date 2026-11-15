@@ -339,13 +339,20 @@ class CrewState:
             im.trend = trend(metric, im.slope_per_min)
             im.since_min = (m.ts - im.first_ts) // 60
 
-        primary = self._pick_primary(flagged, env_flagged) or inc.primary
+        picked = self._pick_primary(flagged, env_flagged)
+        primary = picked or inc.primary
         if primary is not None:
             inc.metrics = {primary: inc.metrics[primary]} | {
                 k: v for k, v in inc.metrics.items() if k != primary
             }
-            z = evals[primary].z if primary in evals else None
-            inc.pattern = rule_pattern(primary, z is None or z > 0, ctx)
+            # Name the pattern only while something is flagged. During recovery the
+            # values are back near the norm, and the sign of z would rename the
+            # incident (hypoxia -> nothing, tachycardia -> bradycardia).
+            if picked is not None or inc.pattern is None:
+                z = evals[primary].z if primary in evals else None
+                inc.pattern = (
+                    rule_pattern(primary, z is None or z > 0, ctx) or inc.pattern
+                )
 
     @staticmethod
     def _pick_primary(

@@ -1,0 +1,585 @@
+{
+  "C1_rest_hr": {
+    "S2": {
+      "rest_hr": 75.6,
+      "split": "train"
+    },
+    "S4": {
+      "rest_hr": 82.8,
+      "split": "train"
+    },
+    "S5": {
+      "rest_hr": 114.1,
+      "split": "train"
+    },
+    "S6": {
+      "rest_hr": 99.0,
+      "split": "train"
+    },
+    "S7": {
+      "rest_hr": 78.9,
+      "split": "train"
+    },
+    "S8": {
+      "rest_hr": 68.3,
+      "split": "train"
+    },
+    "S9": {
+      "rest_hr": 75.3,
+      "split": "train"
+    },
+    "S11": {
+      "rest_hr": 92.3,
+      "split": "train"
+    },
+    "S13": {
+      "rest_hr": 76.9,
+      "split": "train"
+    },
+    "S15": {
+      "rest_hr": 67.9,
+      "split": "train"
+    },
+    "S1": {
+      "rest_hr": 67.9,
+      "split": "holdout"
+    },
+    "S3": {
+      "rest_hr": 84.7,
+      "split": "holdout"
+    },
+    "S10": {
+      "rest_hr": 78.6,
+      "split": "holdout"
+    },
+    "S12": {
+      "rest_hr": 64.0,
+      "split": "holdout"
+    },
+    "S14": {
+      "rest_hr": 80.3,
+      "split": "holdout"
+    }
+  },
+  "C2": {
+    "act_mg_1min": {
+      "dalia_rest": {
+        "p5": 7.2,
+        "p25": 17.1,
+        "p50": 27.0,
+        "p75": 52.2,
+        "p95": 91.2,
+        "n": 704
+      },
+      "dalia_active": {
+        "p5": 73.3,
+        "p25": 156.4,
+        "p50": 219.3,
+        "p75": 268.8,
+        "p95": 367.4,
+        "n": 270
+      },
+      "sleep_asleep": {
+        "p5": 1.2,
+        "p25": 2.1,
+        "p50": 3.2,
+        "p75": 5.4,
+        "p95": 8.8,
+        "n": 7422
+      },
+      "sleep_awake_in_bed": {
+        "p5": 1.8,
+        "p25": 3.0,
+        "p50": 6.8,
+        "p75": 12.6,
+        "p95": 48.9,
+        "n": 549
+      },
+      "dalia_by_activity": {
+        "transient": {
+          "p5": 23.0,
+          "p25": 90.6,
+          "p50": 170.0,
+          "p75": 230.9,
+          "p95": 297.6,
+          "n": 329
+        },
+        "sitting": {
+          "p5": 3.5,
+          "p25": 7.2,
+          "p50": 14.3,
+          "p75": 18.1,
+          "p95": 25.9,
+          "n": 95
+        },
+        "stairs": {
+          "p5": 152.8,
+          "p25": 193.1,
+          "p50": 231.3,
+          "p75": 268.8,
+          "p95": 384.9,
+          "n": 65
+        },
+        "table_soccer": {
+          "p5": 29.3,
+          "p25": 64.2,
+          "p50": 88.1,
+          "p75": 122.2,
+          "p95": 182.5,
+          "n": 44
+        },
+        "cycling": {
+          "p5": 102.7,
+          "p25": 141.8,
+          "p50": 208.6,
+          "p75": 309.4,
+          "p95": 406.3,
+          "n": 71
+        },
+        "driving": {
+          "p5": 43.0,
+          "p25": 53.6,
+          "p50": 62.3,
+          "p75": 75.6,
+          "p95": 114.0,
+          "n": 145
+        },
+        "lunch": {
+          "p5": 12.3,
+          "p25": 21.9,
+          "p50": 30.0,
+          "p75": 45.7,
+          "p95": 96.4,
+          "n": 284
+        },
+        "walking": {
+          "p5": 182.6,
+          "p25": 207.3,
+          "p50": 236.2,
+          "p75": 268.5,
+          "p95": 340.2,
+          "n": 90
+        },
+        "working": {
+          "p5": 6.8,
+          "p25": 12.4,
+          "p50": 18.6,
+          "p75": 24.7,
+          "p95": 41.9,
+          "n": 180
+        }
+      }
+    },
+    "active_equal_error": {
+      "threshold": 80.2,
+      "error_low_class": 0.0739,
+      "error_high_class": 0.0741
+    },
+    "sleep_equal_error": {
+      "threshold": 8.1,
+      "error_low_class": 0.0705,
+      "error_high_class": 0.071
+    },
+    "current": {
+      "ACTIVE_ACT_MG": 80,
+      "SLEEP_ACT_MG": 12
+    },
+    "frac_asleep_minutes_at_or_below_sleep_threshold": 0.9919,
+    "frac_dalia_rest_minutes_at_or_below_sleep_threshold": 0.1378
+  },
+  "C3": {
+    "constants": {
+      "ACTIVE_ACT_MG": 80,
+      "ACTIVE_COOLDOWN_S": 180,
+      "ACTIVE_COOLDOWN_MIN_RUN": 2,
+      "SLEEP_ACT_MG": 12,
+      "SLEEP_RUN_MIN": 15,
+      "SLEEP_NOISE_PENALTY": 2,
+      "SLEEP_HR_MARGIN": 10
+    },
+    "train": {
+      "dalia": {
+        "n_minutes": 974,
+        "n_skipped_none_or_mixed": 421,
+        "n_skipped_predicted_off": 0,
+        "accuracy": 0.8706,
+        "balanced_accuracy": 0.9037,
+        "recall": {
+          "rest": 0.8295,
+          "active": 0.9778
+        },
+        "confusion": {
+          "rest": {
+            "rest": 584,
+            "active": 120
+          },
+          "active": {
+            "active": 264,
+            "rest": 6
+          }
+        },
+        "by_activity": {
+          "sitting": {
+            "expected": "rest",
+            "n": 95,
+            "recall": 1.0
+          },
+          "stairs": {
+            "expected": "active",
+            "n": 65,
+            "recall": 1.0
+          },
+          "table_soccer": {
+            "expected": "active",
+            "n": 44,
+            "recall": 0.8636
+          },
+          "cycling": {
+            "expected": "active",
+            "n": 71,
+            "recall": 1.0
+          },
+          "driving": {
+            "expected": "rest",
+            "n": 145,
+            "recall": 0.6828
+          },
+          "lunch": {
+            "expected": "rest",
+            "n": 284,
+            "recall": 0.8345
+          },
+          "walking": {
+            "expected": "active",
+            "n": 90,
+            "recall": 1.0
+          },
+          "working": {
+            "expected": "rest",
+            "n": 180,
+            "recall": 0.85
+          }
+        }
+      },
+      "sleep_cold_start": {
+        "n_minutes": 7968,
+        "n_skipped_none_or_mixed": 1131,
+        "n_skipped_predicted_off": 16,
+        "accuracy": 0.91,
+        "balanced_accuracy": 0.8406,
+        "recall": {
+          "rest": 0.7601,
+          "sleep": 0.921
+        },
+        "confusion": {
+          "rest": {
+            "rest": 412,
+            "sleep": 125,
+            "active": 5
+          },
+          "sleep": {
+            "sleep": 6839,
+            "rest": 587
+          }
+        }
+      },
+      "sleep_known_rest_hr": {
+        "n_minutes": 7968,
+        "n_skipped_none_or_mixed": 1131,
+        "n_skipped_predicted_off": 16,
+        "accuracy": 0.8635,
+        "balanced_accuracy": 0.8241,
+        "recall": {
+          "rest": 0.7786,
+          "sleep": 0.8696
+        },
+        "confusion": {
+          "rest": {
+            "rest": 422,
+            "sleep": 115,
+            "active": 5
+          },
+          "sleep": {
+            "sleep": 6458,
+            "rest": 968
+          }
+        }
+      },
+      "combined_known_rest_hr": {
+        "n_minutes": 8942,
+        "n_skipped_none_or_mixed": 1552,
+        "n_skipped_predicted_off": 16,
+        "accuracy": 0.8642,
+        "balanced_accuracy": 0.8849,
+        "recall": {
+          "rest": 0.8074,
+          "active": 0.9778,
+          "sleep": 0.8696
+        },
+        "confusion": {
+          "rest": {
+            "rest": 1006,
+            "active": 125,
+            "sleep": 115
+          },
+          "active": {
+            "active": 264,
+            "rest": 6
+          },
+          "sleep": {
+            "sleep": 6458,
+            "rest": 968
+          }
+        }
+      },
+      "combined_cold_start": {
+        "n_minutes": 8942,
+        "n_skipped_none_or_mixed": 1552,
+        "n_skipped_predicted_off": 16,
+        "accuracy": 0.9057,
+        "balanced_accuracy": 0.8994,
+        "recall": {
+          "rest": 0.7994,
+          "active": 0.9778,
+          "sleep": 0.921
+        },
+        "confusion": {
+          "rest": {
+            "rest": 996,
+            "active": 125,
+            "sleep": 125
+          },
+          "active": {
+            "active": 264,
+            "rest": 6
+          },
+          "sleep": {
+            "sleep": 6839,
+            "rest": 587
+          }
+        }
+      }
+    },
+    "holdout": {
+      "dalia": {
+        "n_minutes": 526,
+        "n_skipped_none_or_mixed": 229,
+        "n_skipped_predicted_off": 0,
+        "accuracy": 0.8802,
+        "balanced_accuracy": 0.9082,
+        "recall": {
+          "rest": 0.8431,
+          "active": 0.9733
+        },
+        "confusion": {
+          "rest": {
+            "rest": 317,
+            "active": 59
+          },
+          "active": {
+            "active": 146,
+            "rest": 4
+          }
+        },
+        "by_activity": {
+          "sitting": {
+            "expected": "rest",
+            "n": 48,
+            "recall": 0.9792
+          },
+          "stairs": {
+            "expected": "active",
+            "n": 33,
+            "recall": 1.0
+          },
+          "table_soccer": {
+            "expected": "active",
+            "n": 23,
+            "recall": 0.8261
+          },
+          "cycling": {
+            "expected": "active",
+            "n": 35,
+            "recall": 1.0
+          },
+          "driving": {
+            "expected": "rest",
+            "n": 72,
+            "recall": 0.7639
+          },
+          "lunch": {
+            "expected": "rest",
+            "n": 160,
+            "recall": 0.8625
+          },
+          "walking": {
+            "expected": "active",
+            "n": 59,
+            "recall": 1.0
+          },
+          "working": {
+            "expected": "rest",
+            "n": 96,
+            "recall": 0.8021
+          }
+        }
+      },
+      "sleep_cold_start": {
+        "n_minutes": 3498,
+        "n_skipped_none_or_mixed": 466,
+        "n_skipped_predicted_off": 38,
+        "accuracy": 0.8491,
+        "balanced_accuracy": 0.7769,
+        "recall": {
+          "rest": 0.6895,
+          "sleep": 0.8643
+        },
+        "confusion": {
+          "rest": {
+            "rest": 211,
+            "sleep": 91,
+            "active": 4
+          },
+          "sleep": {
+            "sleep": 2759,
+            "rest": 433
+          }
+        }
+      },
+      "sleep_known_rest_hr": {
+        "n_minutes": 3498,
+        "n_skipped_none_or_mixed": 466,
+        "n_skipped_predicted_off": 38,
+        "accuracy": 0.8113,
+        "balanced_accuracy": 0.7577,
+        "recall": {
+          "rest": 0.6928,
+          "sleep": 0.8227
+        },
+        "confusion": {
+          "rest": {
+            "rest": 212,
+            "sleep": 90,
+            "active": 4
+          },
+          "sleep": {
+            "sleep": 2626,
+            "rest": 566
+          }
+        }
+      },
+      "combined_known_rest_hr": {
+        "n_minutes": 4024,
+        "n_skipped_none_or_mixed": 695,
+        "n_skipped_predicted_off": 38,
+        "accuracy": 0.8203,
+        "balanced_accuracy": 0.8572,
+        "recall": {
+          "rest": 0.7757,
+          "active": 0.9733,
+          "sleep": 0.8227
+        },
+        "confusion": {
+          "rest": {
+            "rest": 529,
+            "active": 63,
+            "sleep": 90
+          },
+          "active": {
+            "active": 146,
+            "rest": 4
+          },
+          "sleep": {
+            "sleep": 2626,
+            "rest": 566
+          }
+        }
+      },
+      "combined_cold_start": {
+        "n_minutes": 4024,
+        "n_skipped_none_or_mixed": 695,
+        "n_skipped_predicted_off": 38,
+        "accuracy": 0.8531,
+        "balanced_accuracy": 0.8706,
+        "recall": {
+          "rest": 0.7742,
+          "active": 0.9733,
+          "sleep": 0.8643
+        },
+        "confusion": {
+          "rest": {
+            "rest": 528,
+            "active": 63,
+            "sleep": 91
+          },
+          "active": {
+            "active": 146,
+            "rest": 4
+          },
+          "sleep": {
+            "sleep": 2759,
+            "rest": 433
+          }
+        }
+      }
+    }
+  },
+  "subjects": {
+    "dalia_train": [
+      "S2",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8",
+      "S9",
+      "S11",
+      "S13",
+      "S15"
+    ],
+    "dalia_holdout": [
+      "S1",
+      "S3",
+      "S10",
+      "S12",
+      "S14"
+    ],
+    "sleep_train": [
+      "46343",
+      "759667",
+      "781756",
+      "844359",
+      "1360686",
+      "1449548",
+      "1455390",
+      "1818471",
+      "2598705",
+      "2638030",
+      "3509524",
+      "3997827",
+      "4314139",
+      "4426783",
+      "5132496",
+      "5383425",
+      "5498603",
+      "5797046",
+      "8173033",
+      "8686948",
+      "9618981"
+    ],
+    "sleep_holdout": [
+      "1066528",
+      "4018081",
+      "6220552",
+      "8000685",
+      "8258170",
+      "8530312",
+      "8692923",
+      "9106476",
+      "9961348"
+    ],
+    "sleep_c2_extra": [
+      "7749105"
+    ]
+  }
+}

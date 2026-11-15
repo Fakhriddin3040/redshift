@@ -77,12 +77,49 @@ async def live(socket: WebSocket, hub: Hub, crew: int = 1) -> None:
 
 @get("/crew")
 async def crew_list(hub: Hub) -> list[dict[str, Any]]:
-    return [views.crew_item(rt) for rt in hub.crews.values()]
+    return [views.crew_item(rt, await hub.nights(rt.id)) for rt in hub.crews.values()]
 
 
 @get("/crew/{crew_id:int}/today")
 async def crew_today(hub: Hub, crew_id: int) -> dict[str, Any]:
-    return views.today(crew_or_404(hub, crew_id))
+    rt = crew_or_404(hub, crew_id)
+    return views.today(rt, await hub.nights(rt.id), hub.radiation)
+
+
+@get("/crew/{crew_id:int}/sleep")
+async def crew_sleep(hub: Hub, crew_id: int) -> dict[str, Any]:
+    rt = crew_or_404(hub, crew_id)
+    return views.sleep(rt, await hub.nights(rt.id))
+
+
+@post("/crew/{crew_id:int}/checkin", status_code=200)
+async def crew_checkin(hub: Hub, crew_id: int, data: dict[str, Any]) -> dict[str, Any]:
+    rt = crew_or_404(hub, crew_id)
+    if rt.now_ts is None:
+        raise ValidationException("no data for this crew member yet")
+    try:
+        body = {
+            "sleep": _scale(data, "sleep"),
+            "mood": _scale(data, "mood"),
+            "energy": _scale(data, "energy"),
+            "symptoms": [str(s)[:40] for s in data.get("symptoms") or []][:12],
+            "note": str(data.get("note") or "")[:2000],
+        }
+    except (TypeError, ValueError) as exc:
+        raise ValidationException(str(exc)) from exc
+    return await hub.file_checkin(rt, body)
+
+
+def _scale(data: dict[str, Any], key: str) -> int:
+    value = int(data[key]) if data.get(key) is not None else None
+    if value is None or not 1 <= value <= 5:
+        raise ValueError(f"{key} must be a number from 1 to 5")
+    return value
+
+
+@get("/radiation")
+async def radiation(hub: Hub) -> dict[str, Any]:
+    return views.radiation(hub.radiation)
 
 
 @get("/crew/{crew_id:int}/metric/{m:str}")
@@ -193,6 +230,9 @@ ROUTES = [
     live,
     crew_list,
     crew_today,
+    crew_sleep,
+    crew_checkin,
+    radiation,
     crew_metric,
     crew_alerts,
     ack_alert,

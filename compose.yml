@@ -29,10 +29,31 @@ services:
         required: false
     environment:
       VIGIL_DATABASE_URL: postgresql://vigil:vigil@postgres:5432/vigil
-      VIGIL_VDEV_URL: ${VIGIL_VDEV_URL:-http://vdev:8100}
+      # Fixed: inside the container localhost is the container itself.
+      VIGIL_VDEV_URL: http://vdev:8100
       VIGIL_OLLAMA_URL: ${VIGIL_OLLAMA_URL:-}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      # Healthy once the schema is created, the state is restored and HTTP answers.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 5s
+    networks:
+      net:
+
+  vdev:
+    build: .
+    restart: unless-stopped
+    command: ["uvicorn", "vigil.vdev.app:app", "--host", "0.0.0.0", "--port", "8100"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      VDEV_INGEST_URL: ws://backend:8000/api/v1/ingest
+      VDEV_BACKEND_URL: http://backend:8000/api/v1
     networks:
       net:
 
@@ -45,7 +66,8 @@ services:
         NEXT_PUBLIC_CREW_ID: ${NEXT_PUBLIC_CREW_ID:-1}
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "${CLIENT_PORT:-3000}:3000"
     networks:

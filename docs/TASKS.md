@@ -34,23 +34,26 @@ If block A is not finished by 16:00, drop everything in block C and move its tim
 
 ---
 
-## 1. Current state [verified]
+## 1. Current state [verified 2026-11-15, 16:30 +05]
 
 | Area | State | Evidence |
 |---|---|---|
-| Core pipeline (`vigil/core`) | Done: frame, minute, context, baseline, levels, incident | 40 tests pass (`uv run pytest`, 0.18 s) |
-| Backend (`vigil/backend`) | Done: `/ingest`, `/live`, `/crew`, `/today`, `/metric`, `/alerts`, `/ack`, `/sim/*` forwarding, restore on restart | `GET /api/v1/health` → `ok: true` |
-| Data in the backend | **None** | `GET /api/v1/crew` → every `now_ts` is `null` |
-| Virtual device | **Missing** | no `vigil/vdev/`; `GET /api/v1/sim/state` → `503 vdev unavailable` |
-| Backend endpoints not built | `/radiation`, `/checkin`, `/report`, `/sleep`, `/device`; `record` in `/today` is all `null`; alert `text` is always `null` | IMPL §21 |
-| ML | **Missing**: no `ml/` directory, no features, no model. The pattern name comes from a rule (IMPL §10.6), `p` is always `null` | — |
-| LLM | **Missing**. Ollama is installed on this machine but not running | — |
-| Client | Built: Today, metric page, Crew, Device, Critical screen, level backgrounds, banner, notices, demo panel. Check-in and Report work but are stored only in the browser (`localStorage`). Sleep and Radiation are static empty pages | `client/src` |
-| Compose | `postgres`, `backend`, `client` run. No `vdev` service | `docker ps` |
-| Datasets | PPG-DaLiA, BIDMC, sleep-accel on disk. NASA EDA CO₂ and radiation for RR-1, RR-3, RR-9, RR-12, RR-19 in `data/eda/`. RadLab April 2022 in `data/radlab_iss.csv` | `docs/DATA_PLAN.md` |
-| Repository | Private; no `LICENSE`; README describes only the backend and points to a `TASK.md` that is not in the repository; `.idea/` is tracked; two stray `index.html?spacecraft=…` files (3 MB, wget output) sit untracked in the root | `git status`, `curl` |
+| Core pipeline (`vigil/core`) | Done. Context rule refitted on real data; pattern name kept during recovery | 55 tests pass |
+| Backend (`vigil/backend`) | Done: ingest, live, crew, today, metric, alerts, ack, sim forwarding, restore; **new:** `/radiation`, `/crew/{id}/sleep`, `/crew/{id}/checkin`, alert text from templates, pattern from the model | `GET /api/v1/health` → all counters 0 |
+| Virtual device (`vigil/vdev`) | **Done (T1).** 7 streams, 14 days of history in about 8 s, live at ×1/×10/×60, 9 scenarios, real ISS CO₂, reset, reconnect | acceptance checks 1–8 in §2.9 pass against a local stack |
+| False alarms (T2) | **Pass.** 0 incidents on normal data | `python -m ml.eval_false_alarms --seeds 3`, `docs/DATA_NOTES.md` §7 |
+| Radiation (T3) | **Done.** Endpoint + page, NASA OSDR EDA RR-12 | `/radiation` |
+| Real DaLiA day stream (T4) | **Tried, not enabled.** With real segments the detector gives 4–9 incidents per person-day; the stream stays simulated | `docs/DATA_NOTES.md` §10. Use the "simulated vital signs" wording in §5 |
+| Sleep (T5) | **Done.** Endpoint + page + Crew column | `/crew/1/sleep` |
+| Alert text (T6a) | **Done.** `docs/actions.yaml` + templates | `text_src = "template"` |
+| Check-in on the server (T6b) | **Done** for check-in. The Report page is still assembled in the browser | `POST /crew/{id}/checkin` |
+| Pattern classifier (T7) | **Done.** XGBoost, macro-F1 0.99 on simulated windows of people not in training; loaded by the backend without the xgboost package | `ml/models/pattern.json`, `docs/DATA_NOTES.md` §9 |
+| LLM (T8) | **Not done, cut.** Text is from templates | say "template explanations" |
+| Client | Radiation and Sleep pages show data; Today record rows filled | `client/src/app` |
+| Compose | `postgres`, `backend`, `vdev`, `client` | `compose.yml` |
+| Repository (T10) | `LICENSE`, English `README.md`, `docs/AI_USE.md`, `docs/DATA_LICENSES.md`, `docs/DATA_NOTES.md` written; `.idea/` no longer tracked. **Still to do by a person:** make the repository public, decide on the Russian documents, fill in the designers' tools in `AI_USE.md` | `git status` |
 
-What the client already does without server help: if an alert has no `text`, the client writes the title, the reason and the action steps itself (`client/src/lib/text.ts`). So the Critical screen shows an explanation and an action as soon as data flows.
+Still open, all for people: confirm the deadline and the rules (section 0), rehearse and record the demo (T11), the project page.
 
 ---
 
@@ -141,7 +144,7 @@ Clamp normal output so a hard limit can never fire without a scenario: heart rat
 
 Day schedule: 8 h sleep, 16 h awake, two exercise blocks.
 
-Motion: sleep `act_mg` 0–5 (the sleep rule needs ≤ 8 for 15 minutes in a row); rest 15–40; exercise ≥ 100 (active is ≥ 60).
+Motion: sleep `act_mg` 0–5 (the sleep rule counts minutes at ≤ 12 up to 15; a restless minute takes 2 off); rest 15–40; exercise ≥ 100 (active is ≥ 80).
 
 Signal quality: 85–100 normally.
 

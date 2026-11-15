@@ -196,3 +196,19 @@ def test_restore_rebuilds_norm():
     assert not st.baseline.lookup("hr", Ctx.REST, 7 * DAY).learning
     assert st.learned
     assert st.baseline_status().ready_pct == 100
+
+
+def test_pattern_is_kept_during_recovery():
+    st = learned_state()
+    t = 10 * DAY
+    res = st.on_minute(normal_minute(t, hr=115.0))
+    assert res.incident.pattern == "tachycardia_rest"
+    # Recovery: values slightly on the other side of the norm must not rename it.
+    for i in range(1, 6):
+        res = st.on_minute(normal_minute(t + i * 60, hr=59.0, spo2=97.4))
+        assert res.incident.pattern == "tachycardia_rest"
+
+    st = learned_state()
+    st.on_minute(normal_minute(t, spo2=88.0))
+    res = st.on_minute(normal_minute(t + 60, spo2=97.6))
+    assert res.incident.pattern == "hypoxia"

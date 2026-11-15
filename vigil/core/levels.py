@@ -83,6 +83,7 @@ class EnvEval:
     ppco2_level: int = 0
     press: float | None = None
     press_level: int = 0
+    press_median: float | None = None  # over the last 24 h
 
 
 class EnvTracker:
@@ -116,6 +117,7 @@ class EnvTracker:
         if m.press_hpa is not None:
             out.press = m.press_hpa
             out.press_level = self._press_level(m.ts, m.press_hpa)
+            out.press_median = self._press_median
         return out
 
     def _press_level(self, ts: int, cur: float) -> int:

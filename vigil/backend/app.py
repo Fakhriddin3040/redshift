@@ -14,9 +14,12 @@ from vigil.backend.api.routes import ROUTES
 from vigil.backend.config import get_settings
 from vigil.backend.db import Database
 from vigil.backend.hub import Hub
+from vigil.backend.narrate import load_actions
 from vigil.backend.writer import Writer
+from vigil.core.pattern_model import PatternModel
 
 API_PREFIX = "/api/v1"
+log = logging.getLogger("vigil.app")
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
@@ -29,8 +32,11 @@ async def lifespan(app: Litestar) -> AsyncIterator[None]:
     db = await Database.connect(settings.database_url)
     await db.init_schema()
     writer = Writer(db)
-    hub = Hub(db, writer)
+    model = PatternModel.load(settings.pattern_model)
+    log.info("pattern model: %s", "loaded" if model else "not found, using the rule")
+    hub = Hub(db, writer, load_actions(settings.actions_file), model)
     await hub.load()
+    await hub.load_radiation()
     writer.start()
     app.state.hub = hub
     app.state.vdev = httpx.AsyncClient(base_url=settings.vdev_url, timeout=5.0)
