@@ -4,17 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { Loading } from "@/components/Loading";
 import { deviceLine } from "@/components/Shell";
 import { api } from "@/lib/api";
-import { hhmm, minutes } from "@/lib/format";
+import { useI18n } from "@/i18n";
+import { hhmm } from "@/lib/format";
 import { useVigil } from "@/lib/store";
 import type { Card, CrewItem, MetricResponse } from "@/lib/types";
 
-function sensorStatus(cards: Card[], keys: string[]): string {
-  const hit = cards.filter((c) => keys.includes(c.m));
-  return hit.some((c) => c.state !== "not_measured") ? "Working" : "Not installed";
+function sensorWorks(cards: Card[], keys: string[]): boolean {
+  return cards.some((c) => keys.includes(c.m) && c.state !== "not_measured");
 }
 
 export default function DevicePage() {
   const { today, crewId, lastTickAt } = useVigil();
+  const { t } = useI18n();
+  const p = t.devicePage;
   const [day, setDay] = useState<MetricResponse | null>(null);
   const [me, setMe] = useState<CrewItem | null>(null);
   const [ago, setAgo] = useState<number | null>(null);
@@ -43,14 +45,14 @@ export default function DevicePage() {
   if (!today) return <Loading />;
 
   const d = today.device;
-  const line = deviceLine(today, lastTickAt);
+  const line = deviceLine(today, lastTickAt, t);
   const offSince = today.vitals.map((c) => c.since_ts).find((s) => s != null);
   const title =
     d.link === "no_link"
-      ? `No link to the wristband${line.text.startsWith("No link for") ? ` for ${line.text.slice(12)}` : ""}.`
+      ? p.noLink(line.noLinkMin ? t.minutes(line.noLinkMin) : null)
       : d.worn === false
-        ? `Wristband not worn${offSince ? ` since ${hhmm(offSince)}` : ""}.`
-        : "Wristband connected.";
+        ? p.notWorn(offSince ? hhmm(offSince) : null)
+        : p.connected;
 
   // 24 h presence from the last day of minute points
   const segs: { a: number; b: number }[] = [];
@@ -76,60 +78,60 @@ export default function DevicePage() {
   return (
     <section className="page">
       <div>
-        <div className="eyebrow">Device</div>
+        <div className="eyebrow">{p.eyebrow}</div>
         <h1 className="h1">{title}</h1>
       </div>
 
       <div>
-        <h2 className="h2" style={{ marginBottom: 12 }}>Data today</h2>
+        <h2 className="h2" style={{ marginBottom: 12 }}>{p.dataToday}</h2>
         <div className="dayband">
           {segs.map((s) => <i key={s.a} style={{ left: `${s.a * 100}%`, width: `${(s.b - s.a) * 100}%` }} />)}
         </div>
         <div className="axis">{axis.map((t, i) => <span key={i}>{t}</span>)}</div>
         <p className="foot-note num" style={{ marginTop: 10 }}>
-          {day ? `${minutes(withData)} of data · ${minutes(total - withData)} without · last 24 hours` : "No readings in this period."}
+          {day ? p.coverage(t.minutes(withData), t.minutes(total - withData)) : p.noReadings}
         </p>
       </div>
 
       <div className="tiles">
         <div className="tile">
-          <div className="k">Link</div>
-          <div className="v" style={{ fontSize: 24, color: d.link === "no_link" ? "var(--kick)" : undefined }}>{d.link === "connected" ? "Connected" : "No link"}</div>
-          <div className="n">{ago != null ? `Last reading ${ago} s ago` : "No live reading yet"}</div>
+          <div className="k">{p.link}</div>
+          <div className="v" style={{ fontSize: 24, color: d.link === "no_link" ? "var(--kick)" : undefined }}>{d.link === "connected" ? p.connectedWord : p.noLinkWord}</div>
+          <div className="n">{ago != null ? p.lastReading(ago) : p.noLive}</div>
         </div>
         <div className="tile">
-          <div className="k">Signal</div>
-          <div className="v" style={{ fontSize: 24, color: d.signal === "poor" ? "var(--kick)" : undefined }}>{d.signal ? d.signal[0].toUpperCase() + d.signal.slice(1) : "—"}</div>
-          <div className="n">{d.worn === false ? "Not worn" : "Optical contact"}</div>
+          <div className="k">{p.signal}</div>
+          <div className="v" style={{ fontSize: 24, color: d.signal === "poor" ? "var(--kick)" : undefined }}>{d.signal ? t.signal[d.signal] : "—"}</div>
+          <div className="n">{d.worn === false ? p.notWorn2 : p.optical}</div>
         </div>
         <div className="tile">
-          <div className="k">Battery</div>
+          <div className="k">{p.battery}</div>
           <div className="v" style={{ fontSize: 24 }}>{d.batt != null ? `${d.batt} %` : "—"}</div>
-          <div className="n">Wristband</div>
+          <div className="n">{p.wristband}</div>
         </div>
         <div className="tile">
-          <div className="k">Data today</div>
+          <div className="k">{p.dataToday}</div>
           <div className="v" style={{ fontSize: 24 }}>{me?.data_today_pct != null ? `${me.data_today_pct} %` : "—"}</div>
-          <div className="n">Of minutes since 00:00 GMT</div>
+          <div className="n">{p.minutesSince}</div>
         </div>
       </div>
 
       <div>
-        <h2 className="h2" style={{ marginBottom: 4 }}>Sensors</h2>
+        <h2 className="h2" style={{ marginBottom: 4 }}>{p.sensors}</h2>
         <table className="table">
-          <thead><tr><th>Sensor</th><th>Measures</th><th>Status</th></tr></thead>
+          <thead><tr>{p.cols.map((h) => <th key={h}>{h}</th>)}</tr></thead>
           <tbody>
-            {[
-              ["Optical", "Heart rate, blood oxygen, respiration", sensorStatus(cards, ["hr", "spo2", "rr"])],
-              ["Motion", "Activity, sleep", today.ctx ? "Working" : "Not installed"],
-              ["Skin temperature", "Skin temperature", sensorStatus(cards, ["skin_t"])],
-              ["Cabin air", "CO₂, temperature", sensorStatus(cards, ["ppco2", "amb_t"])],
-              ["Pressure", "Cabin pressure", sensorStatus(cards, ["press"])],
-            ].map(([s, m, st]) => (
-              <tr key={s}>
-                <td>{s}</td>
-                <td className="mute">{m}</td>
-                <td style={{ color: st === "Working" ? undefined : "var(--mute)" }}>{st}</td>
+            {([
+              ["optical", sensorWorks(cards, ["hr", "spo2", "rr"])],
+              ["motion", today.ctx != null],
+              ["skin", sensorWorks(cards, ["skin_t"])],
+              ["cabin", sensorWorks(cards, ["ppco2", "amb_t"])],
+              ["press", sensorWorks(cards, ["press"])],
+            ] as const).map(([k, works]) => (
+              <tr key={k}>
+                <td>{p.rows[k][0]}</td>
+                <td className="mute">{p.rows[k][1]}</td>
+                <td style={{ color: works ? undefined : "var(--mute)" }}>{works ? p.working : p.notInstalled}</td>
               </tr>
             ))}
           </tbody>

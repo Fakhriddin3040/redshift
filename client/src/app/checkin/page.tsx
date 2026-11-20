@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/i18n";
 import { hhmm } from "@/lib/format";
 import { useVigil } from "@/lib/store";
 import { SCALES, SYMPTOMS } from "@/lib/checkin";
 
-type ScaleKey = (typeof SCALES)[number][0];
+type ScaleKey = (typeof SCALES)[number];
 
 export default function CheckinPage() {
   const { checkin } = useVigil();
@@ -15,6 +16,8 @@ export default function CheckinPage() {
 
 function CheckinForm() {
   const { checkin, saveCheckin, today } = useVigil();
+  const { t } = useI18n();
+  const c = t.checkin;
   const [vals, setVals] = useState<Record<ScaleKey, number>>(
     checkin ? { sleep: checkin.sleep, mood: checkin.mood, energy: checkin.energy } : { sleep: 3, mood: 3, energy: 3 }
   );
@@ -24,12 +27,12 @@ function CheckinForm() {
   return (
     <section className="page" style={{ maxWidth: 720, gap: 28 }}>
       <div>
-        <div className="eyebrow">Daily check-in · about one minute</div>
-        <h1 className="h1">How are you today?</h1>
-        <p className="lede">Sensors miss what you feel. Your answers are compared with your own earlier entries, not with a crew average.</p>
+        <div className="eyebrow">{c.eyebrow}</div>
+        <h1 className="h1">{c.title}</h1>
+        <p className="lede">{c.lede}</p>
       </div>
       <div>
-        {SCALES.map(([k, label, lo, hi]) => (
+        {SCALES.map((k) => ({ k, ...c.scales[k] })).map(({ k, label, lo, hi }) => (
           <div key={k} style={{ borderTop: "1px solid var(--color-divider)", padding: "16px 0", display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontSize: 15, fontWeight: 500, flex: 1, minWidth: 180 }}>{label}</span>
             <span className="mute" style={{ fontSize: 12 }}>{lo}</span>
@@ -58,9 +61,10 @@ function CheckinForm() {
           </div>
         ))}
         <div style={{ borderTop: "1px solid var(--color-divider)", padding: "16px 0", display: "flex", flexDirection: "column", gap: 12 }}>
-          <span style={{ fontSize: 15, fontWeight: 500 }}>Anything to note since yesterday?</span>
+          <span style={{ fontSize: 15, fontWeight: 500 }}>{c.anything}</span>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px 24px" }}>
-            {SYMPTOMS.map(([k, label]) => {
+            {SYMPTOMS.map((k) => {
+              const label = c.symptoms[k];
               const on = sym.includes(k);
               return (
                 <button
@@ -78,8 +82,8 @@ function CheckinForm() {
           </div>
         </div>
         <div className="field" style={{ borderTop: "1px solid var(--color-divider)", padding: "16px 0" }}>
-          <label htmlFor="ci-note">In your own words (optional)</label>
-          <textarea id="ci-note" className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Woke twice, stuffy after the reboost" />
+          <label htmlFor="ci-note">{c.ownWords}</label>
+          <textarea id="ci-note" className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder={c.placeholder} />
         </div>
       </div>
       <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
@@ -88,10 +92,10 @@ function CheckinForm() {
           disabled={!today}
           onClick={() => saveCheckin({ ...vals, symptoms: sym, note })}
         >
-          {checkin ? "Update check-in" : "File check-in"}
+          {checkin ? c.update : c.file}
         </button>
         <span className="mute" style={{ fontSize: 13 }}>
-          {checkin ? `Filed at ${hhmm(checkin.filedTs)} GMT and added to your record.` : ""}
+          {checkin ? c.filedAt(hhmm(checkin.filedTs)) : ""}
         </span>
       </div>
     </section>

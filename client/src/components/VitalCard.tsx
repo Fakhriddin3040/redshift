@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useI18n } from "@/i18n";
 import { METRIC, cardLook, cardNote, fmt } from "@/lib/format";
 import type { Card, Today } from "@/lib/types";
 
@@ -52,19 +53,20 @@ function Spark({ card, color }: { card: Card; color: string }) {
 }
 
 export function VitalCard({ card, today }: { card: Card; today: Today }) {
-  const look = cardLook(card);
-  const unit = METRIC[card.m].unit;
+  const { t } = useI18n();
+  const look = cardLook(card, t);
+  const unit = t.metric[card.m].unit;
   const stroke = look.numColor === "var(--mute)" ? "var(--mute)" : look.numColor;
   return (
     <Link href={`/metric/${card.m}`} className="vcard">
-      <span className="label">{METRIC[card.m].label}</span>
+      <span className="label">{t.metric[card.m].label}</span>
       <div className="val">
         <span className="big" style={{ color: look.numColor }}>{fmt(card.value, card.m)}</span>
         <span className="unit">{unit}</span>
       </div>
       <Spark card={card} color={stroke} />
       <div className="bottom">
-        <span className="mute">{cardNote(card, today)}</span>
+        <span className="mute">{cardNote(card, today, t)}</span>
         <span style={{ color: look.statusColor }}>{look.status}</span>
       </div>
     </Link>

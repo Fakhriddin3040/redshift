@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/i18n";
 import { api } from "@/lib/api";
 import { useVigil } from "@/lib/store";
 import type { CrewItem } from "@/lib/types";
@@ -19,6 +20,7 @@ function scenariosFrom(state: unknown): string[] {
 
 export function DemoPanel({ crew }: { crew: CrewItem[] }) {
   const { crewId, setCrewId, refresh } = useVigil();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<unknown>(null);
   const [msg, setMsg] = useState<string>("");
@@ -53,49 +55,49 @@ export function DemoPanel({ crew }: { crew: CrewItem[] }) {
           if (!open) void load();
           setOpen(!open);
         }}>
-        {open ? "Close demo" : "Demo"}
+        {open ? t.demo.close : t.demo.open}
       </button>
       {open && (
-        <div className="demo" role="dialog" aria-label="Demo controls">
+        <div className="demo" role="dialog" aria-label={t.demo.aria}>
           <div className="field">
-            <label htmlFor="demo-crew">Crewmember</label>
+            <label htmlFor="demo-crew">{t.demo.crewmember}</label>
             <select id="demo-crew" className="input" value={crewId} onChange={(e) => setCrewId(Number(e.target.value))}>
-              {(crew.length ? crew : [{ id: crewId, name: `Crew ${crewId}` } as CrewItem]).map((c) => (
+              {(crew.length ? crew : [{ id: crewId, name: t.demo.crewN(crewId) } as CrewItem]).map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </div>
           <div className="field">
-            <label htmlFor="demo-scn">Scenario</label>
+            <label htmlFor="demo-scn">{t.demo.scenario}</label>
             <div className="row">
               {options.length ? (
                 <select id="demo-scn" className="input" style={{ flex: 1 }} value={scenario} onChange={(e) => setScenario(e.target.value)}>
-                  <option value="">Choose…</option>
+                  <option value="">{t.demo.choose}</option>
                   {options.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
               ) : (
-                <input id="demo-scn" className="input" style={{ flex: 1 }} value={scenario} placeholder="e.g. hypoxia" onChange={(e) => setScenario(e.target.value)} />
+                <input id="demo-scn" className="input" style={{ flex: 1 }} value={scenario} placeholder={t.demo.placeholder} onChange={(e) => setScenario(e.target.value)} />
               )}
               <button
                 className="btn btn-primary"
                 disabled={!scenario}
-                onClick={() => run(() => api.simScenario({ crew: crewId, name: scenario, scenario }), `Scenario ${scenario} sent`)}
+                onClick={() => run(() => api.simScenario({ crew: crewId, name: scenario, scenario }), t.demo.sent(scenario))}
               >
-                Run
+                {t.demo.run}
               </button>
             </div>
           </div>
           <div className="field">
-            <label>Speed</label>
+            <label>{t.demo.speed}</label>
             <div className="row">
               <div className="seg">
                 {["1", "10", "60"].map((s) => (
-                  <button key={s} aria-pressed={speed === s} onClick={() => { setSpeed(s); void run(() => api.simSpeed({ speed: Number(s) }), `Speed ×${s}`); }}>
+                  <button key={s} aria-pressed={speed === s} onClick={() => { setSpeed(s); void run(() => api.simSpeed({ speed: Number(s) }), t.demo.speedSet(s)); }}>
                     ×{s}
                   </button>
                 ))}
               </div>
-              <button className="btn btn-text" onClick={() => run(() => api.simReset(), "Reset done")}>Reset</button>
+              <button className="btn btn-text" onClick={() => run(() => api.simReset(), t.demo.resetDone)}>{t.demo.reset}</button>
             </div>
           </div>
           {msg && <div className="mute" style={{ fontSize: 12 }}>{msg}</div>}

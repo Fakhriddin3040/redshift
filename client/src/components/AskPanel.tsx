@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/i18n";
 import { api } from "@/lib/api";
 import { useVigil } from "@/lib/store";
 import type { AskAnswer, AskTurn } from "@/lib/types";
@@ -11,11 +12,6 @@ import type { AskAnswer, AskTurn } from "@/lib/types";
 
 const MAX_QUESTION = 300; // same limit as the server
 const HISTORY_PAIRS = 3;
-const SUGGESTIONS = [
-  "Is anything outside my usual range right now?",
-  "How did I sleep last night?",
-  "What alerts did I have in the last 24 hours?",
-];
 
 interface Exchange {
   id: number;
@@ -26,6 +22,7 @@ interface Exchange {
 
 export function AskPanel({ hidden = false }: { hidden?: boolean }) {
   const { crewId } = useVigil();
+  const { t } = useI18n();
   const [available, setAvailable] = useState(false);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -94,21 +91,21 @@ export function AskPanel({ hidden = false }: { hidden?: boolean }) {
         aria-controls="ask-panel"
         onClick={() => setOpen(!open)}
       >
-        {open ? "Close Ask Vigil" : "Ask Vigil"}
+        {open ? t.ask.close : t.ask.open}
       </button>
       {open && (
-        <div className="ask" id="ask-panel" role="dialog" aria-label="Ask Vigil">
+        <div className="ask" id="ask-panel" role="dialog" aria-label={t.ask.title}>
           <div>
-            <div className="h2">Ask Vigil</div>
+            <div className="h2">{t.ask.title}</div>
             <div className="mute" style={{ fontSize: 12 }}>
-              Answers come only from your own record. Not medical advice.
+              {t.ask.disclaimer}
             </div>
           </div>
 
           <div className="ask-log" aria-live="polite">
             {items.length === 0 && (
               <div className="ask-suggest">
-                {SUGGESTIONS.map((s) => (
+                {t.ask.suggestions.map((s) => (
                   <button key={s} className="btn btn-text" onClick={() => void send(s)}>
                     {s}
                   </button>
@@ -119,14 +116,14 @@ export function AskPanel({ hidden = false }: { hidden?: boolean }) {
               <div key={x.id} className="ask-turn">
                 <div className="q">{x.question}</div>
                 {x.error ? (
-                  <div className="a offline">Could not ask: {x.error}</div>
+                  <div className="a offline">{t.ask.couldNotAsk(x.error)}</div>
                 ) : x.reply === null ? (
-                  <div className="a mute">Reading your record…</div>
+                  <div className="a mute">{t.ask.reading}</div>
                 ) : (
                   <>
                     <div className={x.reply.src === "llm" ? "a" : "a mute"}>{x.reply.answer}</div>
                     {x.reply.src === "llm" && (
-                      <div className="src">Written by the language model from your record</div>
+                      <div className="src">{t.ask.byModel}</div>
                     )}
                   </>
                 )}
@@ -143,7 +140,7 @@ export function AskPanel({ hidden = false }: { hidden?: boolean }) {
             }}
           >
             <label htmlFor="ask-input" className="sr-only">
-              Your question
+              {t.ask.yourQuestion}
             </label>
             <input
               id="ask-input"
@@ -151,12 +148,12 @@ export function AskPanel({ hidden = false }: { hidden?: boolean }) {
               className="input"
               value={text}
               maxLength={MAX_QUESTION}
-              placeholder="Ask about your readings, alerts or sleep"
+              placeholder={t.ask.placeholder}
               autoComplete="off"
               onChange={(e) => setText(e.target.value)}
             />
             <button className="btn btn-primary" type="submit" disabled={busy || !text.trim()}>
-              Ask
+              {t.ask.send}
             </button>
           </form>
         </div>

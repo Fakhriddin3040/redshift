@@ -31,3 +31,15 @@ Card colors follow each card's own `state`, never the page level.
 Notice / banner / Critical copy is built from `pattern` + `metrics` (`src/lib/text.ts`) until the backend fills `text`.
 
 The **Demo** button (bottom right) switches crewmember and drives `/sim/*` (scenario, speed, reset).
+
+## Languages
+
+UI copy lives in `src/i18n/` — one dictionary per language (`en.ts` defines the shape, `ru.ts` is typed against it).
+The switcher in the sidebar stores the choice in `localStorage` (`vigil.locale`); without one, the browser language is used if supported.
+
+To add a language: copy `src/i18n/en.ts` to `src/i18n/<code>.ts`, translate it (`export const xx: Dict = { … }` — a missing key fails
+the build), and add it to `LOCALES` in `src/i18n/index.tsx`. Sentences are functions, so word order, plurals
+(`Intl.PluralRules`, see `ru.ts`) and cases are up to each language.
+
+The server writes alert text and Ask Vigil answers in English only. Locales with `serverText: false` use the client's
+own templates for alert text instead; Ask Vigil answers stay in English.

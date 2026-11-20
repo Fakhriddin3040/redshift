@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useI18n, type Dict } from "@/i18n";
 import { METRIC, fmt, fmtRange, hhmm, shortDay } from "@/lib/format";
 import type { MetricResponse } from "@/lib/types";
 import { gappedPath } from "./VitalCard";
@@ -11,13 +12,14 @@ const PAD = { l: 44, r: 12, t: 14, b: 22 };
 
 const CTX_FILL = ["transparent", "var(--ctx-sleep)", "var(--ctx-rest)", "var(--ctx-active)"];
 
-function limitLabel(kind: string, value: number, unit: string): string {
-  if (kind === "watch_above") return `Limit ${value} ${unit}`;
-  const u = unit === "%" ? " %" : ` ${unit}`;
-  return kind === "critical_below" ? `Critical at ${value}${u} or below` : `Critical at ${value}${u} or above`;
+function limitLabel(kind: string, value: number, unit: string, t: Dict): string {
+  if (kind === "watch_above") return t.chart.limit(`${value} ${unit}`);
+  const v = `${value}${unit === "%" ? " %" : ` ${unit}`}`;
+  return kind === "critical_below" ? t.chart.criticalBelow(v) : t.chart.criticalAbove(v);
 }
 
 export function MetricChart({ data, width }: { data: MetricResponse; width: number }) {
+  const { t } = useI18n();
   const [hover, setHover] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const m = data.m;
@@ -93,7 +95,7 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
     setHover(i >= 0 && i < n ? i : null);
   };
 
-  const fmtTime = (ts: number) => (data.range === "7d" ? shortDay(ts) : hhmm(ts));
+  const fmtTime = (ts: number) => (data.range === "7d" ? shortDay(ts, t) : hhmm(ts));
   const hp = hover != null ? pts[hover] : null;
 
   return (
@@ -105,7 +107,7 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
         onMouseMove={onMove}
         onMouseLeave={() => setHover(null)}
         role="img"
-        aria-label={`${METRIC[m].label}, ${data.range}`}
+        aria-label={`${t.metric[m].label}, ${t.metricPage.ranges[data.range]}`}
       >
         <defs>
           <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -131,7 +133,7 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
           <g key={a}>
             <rect x={x(a) - colW / 2} width={Math.max(colW, x(b) - x(a) + colW)} y={PAD.t} height={plotH} fill="url(#hatch)" />
             {b - a >= n * 0.06 && (
-              <text x={(x(a) + x(b)) / 2} y={PAD.t + 14} textAnchor="middle">No data</text>
+              <text x={(x(a) + x(b)) / 2} y={PAD.t + 14} textAnchor="middle">{t.chart.noData}</text>
             )}
           </g>
         ))}
@@ -150,7 +152,7 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
               .map((l) => (
                 <g key={l.kind + l.value}>
                   <line x1={PAD.l} x2={W - PAD.r} y1={y(l.value)} y2={y(l.value)} stroke={l.kind === "watch_above" ? "var(--kick)" : "var(--attn)"} strokeDasharray="4 4" />
-                  <text x={W - PAD.r} y={y(l.value) - 5} textAnchor="end">{limitLabel(l.kind, l.value, data.unit)}</text>
+                  <text x={W - PAD.r} y={y(l.value) - 5} textAnchor="end">{limitLabel(l.kind, l.value, t.metric[m].unit, t)}</text>
                 </g>
               ))}
 
@@ -165,7 +167,7 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
         )}
 
         {!scale && (
-          <text x={PAD.l + plotW / 2} y={PAD.t + plotH / 2} textAnchor="middle" style={{ fontSize: 14 }}>No readings in this period.</text>
+          <text x={PAD.l + plotW / 2} y={PAD.t + plotH / 2} textAnchor="middle" style={{ fontSize: 14 }}>{t.chart.noReadings}</text>
         )}
 
         {/* base lines */}
@@ -189,16 +191,16 @@ export function MetricChart({ data, width }: { data: MetricResponse; width: numb
 
       {hp && (
         <div className="chart-tip" style={{ left: `${(x(hover!) / W) * 100}%`, transform: `translateX(${hover! > n / 2 ? "-105%" : "5%"})` }}>
-          <div>{data.range === "7d" ? `${shortDay(hp[0])} ${hhmm(hp[0])}` : hhmm(hp[0])}</div>
-          <div>{hp[1] == null ? "No data" : `${fmt(hp[1], m)} ${data.unit}`}</div>
-          {hp[2] != null && hp[3] != null && <div className="mute">Usual {fmtRange([hp[2], hp[3]], m)}</div>}
+          <div>{data.range === "7d" ? `${shortDay(hp[0], t)} ${hhmm(hp[0])}` : hhmm(hp[0])}</div>
+          <div>{hp[1] == null ? t.chart.noData : `${fmt(hp[1], m)} ${t.metric[m].unit}`}</div>
+          {hp[2] != null && hp[3] != null && <div className="mute">{t.chart.usual(fmtRange([hp[2], hp[3]], m))}</div>}
         </div>
       )}
 
       <div className="legend" style={{ marginTop: 6 }}>
-        <span><i style={{ background: "var(--ctx-sleep)" }} />Asleep</span>
-        <span><i style={{ background: "var(--ctx-rest)" }} />Resting</span>
-        <span><i style={{ background: "var(--ctx-active)" }} />Exercise</span>
+        <span><i style={{ background: "var(--ctx-sleep)" }} />{t.chart.asleep}</span>
+        <span><i style={{ background: "var(--ctx-rest)" }} />{t.chart.resting}</span>
+        <span><i style={{ background: "var(--ctx-active)" }} />{t.chart.exercise}</span>
       </div>
     </div>
   );

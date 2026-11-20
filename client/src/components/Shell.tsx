@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { METRIC, fmt, fmtRange, hhmmss, levelColor } from "@/lib/format";
+import { LOCALES, useI18n, type Dict, type Locale } from "@/i18n";
+import { fmt, fmtRange, hhmmss, levelColor } from "@/lib/format";
 import { pageLevel, useVigil } from "@/lib/store";
 import { bannerText, criticalSteps, criticalWhy, incidentOf } from "@/lib/text";
 import type { CrewItem, Today } from "@/lib/types";
@@ -12,31 +13,50 @@ import { AskPanel } from "./AskPanel";
 import { DemoPanel } from "./DemoPanel";
 
 const NAV = [
-  { href: "/", label: "Today" },
-  { href: "/checkin", label: "Check-in" },
-  { href: "/sleep", label: "Sleep" },
-  { href: "/radiation", label: "Radiation" },
-  { href: "/crew", label: "Crew" },
-  { href: "/report", label: "Report" },
-];
+  { href: "/", key: "today" },
+  { href: "/checkin", key: "checkin" },
+  { href: "/sleep", key: "sleep" },
+  { href: "/radiation", key: "radiation" },
+  { href: "/crew", key: "crew" },
+  { href: "/report", key: "report" },
+] as const;
 
-export function deviceLine(today: Today | null, lastTickAt: number | null): { text: string; warn: boolean } {
-  if (!today) return { text: "Waiting for the server", warn: true };
+/** `noLinkMin`: whole minutes since the last live tick, when the link is down. */
+export function deviceLine(
+  today: Today | null,
+  lastTickAt: number | null,
+  t: Dict
+): { text: string; warn: boolean; noLinkMin?: number } {
+  if (!today) return { text: t.device.waiting, warn: true };
   const d = today.device;
   if (d.link === "no_link") {
     const min = lastTickAt ? Math.floor((Date.now() - lastTickAt) / 60000) : null;
-    return { text: min && min >= 1 ? `No link for ${min} min` : "No link", warn: true };
+    return min && min >= 1 ? { text: t.device.noLinkFor(min), warn: true, noLinkMin: min } : { text: t.device.noLink, warn: true };
   }
-  if (d.worn === false) return { text: "Not worn", warn: true };
-  if (d.signal === "poor") return { text: "Signal poor", warn: true };
-  return { text: `Connected · signal ${d.signal ?? "—"}`, warn: false };
+  if (d.worn === false) return { text: t.device.notWorn, warn: true };
+  if (d.signal === "poor") return { text: t.device.signalPoor, warn: true };
+  return { text: t.device.connected(d.signal ? t.signalLower[d.signal] : "—"), warn: false };
+}
+
+function LocaleSwitch() {
+  const { locale, setLocale, t } = useI18n();
+  return (
+    <div className="seg" role="group" aria-label={t.language} style={{ alignSelf: "flex-start", marginBottom: 6 }}>
+      {(Object.keys(LOCALES) as Locale[]).map((l) => (
+        <button key={l} lang={l} title={LOCALES[l].name} aria-pressed={locale === l} onClick={() => setLocale(l)}>
+          {LOCALES[l].short}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function Sidebar({ me }: { me: CrewItem | undefined }) {
   const path = usePathname();
   const { today, lastTickAt, checkin, live, error } = useVigil();
+  const { t } = useI18n();
   const open = today?.notices.filter((n) => n.ack_ts == null).length ?? 0;
-  const dev = deviceLine(today, lastTickAt);
+  const dev = deviceLine(today, lastTickAt, t);
 
   return (
     <aside className="sidebar">
@@ -48,11 +68,11 @@ function Sidebar({ me }: { me: CrewItem | undefined }) {
           if (n.href === "/" && open > 0) {
             badge = <span className="badge num" style={{ color: levelColor(today?.level) }}>{open}</span>;
           } else if (n.href === "/checkin" && today && !checkin) {
-            badge = <span className="badge kick">due</span>;
+            badge = <span className="badge kick">{t.due}</span>;
           }
           return (
             <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined}>
-              <span>{n.label}</span>
+              <span>{t.nav[n.key]}</span>
               {badge}
             </Link>
           );
@@ -60,16 +80,17 @@ function Sidebar({ me }: { me: CrewItem | undefined }) {
       </nav>
 
       <Link href="/device" className="device-block" aria-current={path === "/device" ? "page" : undefined}>
-        <strong>Wristband</strong>
+        <strong>{t.device.wristband}</strong>
         <span style={{ color: dev.warn ? "var(--kick)" : undefined }}>{dev.text}</span>
-        <span>Battery {today?.device.batt != null ? `${today.device.batt} %` : "—"}</span>
+        <span>{t.device.battery(today?.device.batt != null ? `${today.device.batt} %` : "—")}</span>
       </Link>
 
       <div className="side-foot">
+        <LocaleSwitch />
         <span>
-          {today?.flight_day != null ? `Flight day ${today.flight_day} · ` : ""}GMT {hhmmss(today?.now_ts)}
+          {today?.flight_day != null ? `${t.flightDay(today.flight_day)} · ` : ""}GMT {hhmmss(today?.now_ts)}
         </span>
-        <span>{live === "open" ? "Live link open" : error ? "Server unreachable" : "Live link reconnecting…"}</span>
+        <span>{live === "open" ? t.liveOpen : error ? t.serverUnreachable : t.liveReconnecting}</span>
         {me && <span>{me.name}, {me.role}</span>}
       </div>
     </aside>
@@ -78,16 +99,17 @@ function Sidebar({ me }: { me: CrewItem | undefined }) {
 
 function LevelBar({ onShow }: { onShow: (m: string) => void }) {
   const { today } = useVigil();
+  const { t } = useI18n();
   if (!today || today.level < 2) return null;
   const inc = incidentOf(today);
   const crit = today.level === 3;
   return (
     <div className="banner" data-tone={crit ? "critical" : undefined}>
-      <span className="lvl">{crit ? "Critical" : "Alert"}</span>
-      <span className="why">{bannerText(today)}</span>
+      <span className="lvl">{crit ? t.levelCritical : t.levelAlert}</span>
+      <span className="why">{bannerText(today, t)}</span>
       {inc?.primary && (
         <button className="btn btn-secondary" onClick={() => onShow(inc.primary!)}>
-          {crit ? "Show readings" : `Open ${METRIC[inc.primary].lower}`}
+          {crit ? t.showReadings : t.text.openMetric(t.metric[inc.primary].lower)}
         </button>
       )}
     </div>
@@ -96,6 +118,7 @@ function LevelBar({ onShow }: { onShow: (m: string) => void }) {
 
 function CriticalScreen({ onShow }: { onShow: (m: string) => void }) {
   const { today, ack } = useVigil();
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   if (!today) return null;
   const inc = incidentOf(today);
@@ -105,27 +128,27 @@ function CriticalScreen({ onShow }: { onShow: (m: string) => void }) {
   const card = [...today.vitals, ...today.cabin].find((c) => c.m === m);
   const value = card?.value ?? am?.value ?? null;
   const usual = am?.usual ?? card?.usual ?? null;
-  const unit = m ? METRIC[m].unit : "";
-  const steps = criticalSteps(inc);
+  const unit = m ? t.metric[m].unit : "";
+  const steps = criticalSteps(inc, t);
 
   return (
     <div className="critical" role="alertdialog" aria-labelledby="crit-metric" aria-describedby="crit-why">
       <div className="col">
-        <div className="lvl num">Critical · for {Math.max(1, inc.since_min)} min</div>
+        <div className="lvl num">{t.criticalFor(Math.max(1, inc.since_min))}</div>
         {m && (
           <>
-            <div className="metric" id="crit-metric">{METRIC[m].label}</div>
+            <div className="metric" id="crit-metric">{t.metric[m].label}</div>
             <div className="huge">
               {fmt(value, m)}
               <span style={{ fontSize: 32, marginLeft: 10 }}>{unit}</span>
             </div>
             <div className="num" style={{ fontSize: 16 }}>
-              {usual ? `Your usual ${fmtRange(usual, m)}` : card?.limit != null ? `Limit ${card.limit} ${unit}` : "Fixed safety limit"}
-              {am?.trend && am.trend !== "stable" ? ` · ${am.trend}` : ""}
+              {usual ? t.yourUsual(fmtRange(usual, m)) : card?.limit != null ? t.limitValue(`${card.limit} ${unit}`) : t.fixedLimit}
+              {am?.trend && am.trend !== "stable" ? ` · ${t.trendWord[am.trend]}` : ""}
             </div>
           </>
         )}
-        <p className="why" id="crit-why">{criticalWhy(inc, today)}</p>
+        <p className="why" id="crit-why">{criticalWhy(inc, today, t)}</p>
         <ol>
           {steps.map((s) => <li key={s}>{s}</li>)}
         </ol>
@@ -142,11 +165,11 @@ function CriticalScreen({ onShow }: { onShow: (m: string) => void }) {
               }
             }}
           >
-            Acknowledge
+            {t.acknowledge}
           </button>
-          {m && <button className="btn btn-secondary" onClick={() => onShow(m)}>Show readings</button>}
+          {m && <button className="btn btn-secondary" onClick={() => onShow(m)}>{t.showReadings}</button>}
         </div>
-        <div className="foot">Added to today’s report.</div>
+        <div className="foot">{t.addedToReport}</div>
       </div>
     </div>
   );

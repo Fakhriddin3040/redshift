@@ -24,16 +24,11 @@ export interface ReportDraft {
   queued: boolean;
 }
 
-export const REPORT_SECTIONS = [
-  ["vitals", "Vital signs summary"],
-  ["alerts", "Alerts and notices"],
-  ["sleep", "Sleep"],
-  ["checkin", "Daily check-in"],
-  ["cabin", "Cabin air"],
-] as const;
+// Labels are in the dictionary: `t.report.sections[k]`.
+export const REPORT_SECTIONS = ["vitals", "alerts", "sleep", "checkin", "cabin"] as const;
 
 const DEFAULT_REPORT: ReportDraft = {
-  include: Object.fromEntries(REPORT_SECTIONS.map(([k]) => [k, true])),
+  include: Object.fromEntries(REPORT_SECTIONS.map((k) => [k, true])),
   note: "",
   queued: false,
 };

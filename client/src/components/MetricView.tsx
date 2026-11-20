@@ -5,26 +5,25 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Loading } from "./Loading";
 import { MetricChart } from "./MetricChart";
 import { api } from "@/lib/api";
-import { CTX_LABEL, METRIC, PATTERN_LABEL, fmt, fmtRange, fmtUnit, hhmm, isVital, levelColor, levelName, minutes, shortDay } from "@/lib/format";
+import { useI18n, type Dict } from "@/i18n";
+import { fmt, fmtRange, fmtUnit, hhmm, isVital, levelColor, levelName, shortDay } from "@/lib/format";
 import { useVigil } from "@/lib/store";
 import type { MetricKey, MetricResponse, RangeKey } from "@/lib/types";
 
 const RANGES: RangeKey[] = ["1h", "24h", "7d"];
-const RANGE_LABEL: Record<RangeKey, string> = { "1h": "1 h", "24h": "24 h", "7d": "7 d" };
-
-function headline(d: MetricResponse, baselineDay: number, of: number, sinceMin: number | null): string {
+function headline(d: MetricResponse, baselineDay: number, of: number, sinceMin: number | null, t: Dict): string {
   const m = d.m;
   const v = d.now.value;
-  const name = METRIC[m].lower;
-  if (d.now.state === "not_measured") return `${METRIC[m].label} is not measured by this device.`;
-  if (v == null) return `No ${name} reading right now.`;
-  if (m === "ppco2") return `${fmtUnit(v, m)}, ${v > 3 ? "above" : "under"} the 3.0 mmHg limit.`;
-  if (!isVital(m)) return `${fmtUnit(v, m)} in the cabin.`;
-  if (d.now.state === "exercising") return `${fmtUnit(v, m)}, not compared during exercise.`;
-  if (!d.now.usual) return `Still learning your usual ${name} — day ${baselineDay} of ${of}.`;
-  if (!d.now.diff) return `${fmtUnit(v, m)}, within your usual range.`;
-  const dir = d.now.diff < 0 ? "below" : "above";
-  return `${fmtUnit(v, m)}, ${dir} your usual range${sinceMin ? ` for ${sinceMin} minutes` : ""}.`;
+  const name = t.metric[m].lower;
+  const p = t.metricPage;
+  if (d.now.state === "not_measured") return p.notMeasured(t.metric[m].label);
+  if (v == null) return p.noReading(name);
+  if (m === "ppco2") return p.co2(fmtUnit(v, m, t), v > 3);
+  if (!isVital(m)) return p.cabin(fmtUnit(v, m, t));
+  if (d.now.state === "exercising") return p.exercising(fmtUnit(v, m, t));
+  if (!d.now.usual) return p.learning(name, baselineDay, of);
+  if (!d.now.diff) return p.within(fmtUnit(v, m, t));
+  return p.outside(fmtUnit(v, m, t), d.now.diff < 0 ? "below" : "above", sinceMin);
 }
 
 function useWidth<T extends HTMLElement>() {
@@ -41,6 +40,8 @@ function useWidth<T extends HTMLElement>() {
 
 export function MetricView({ m }: { m: MetricKey }) {
   const { crewId, today } = useVigil();
+  const { t } = useI18n();
+  const p = t.metricPage;
   const [range, setRange] = useState<RangeKey>("1h");
   const [data, setData] = useState<MetricResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -66,50 +67,50 @@ export function MetricView({ m }: { m: MetricKey }) {
 
   const inc = today.notices.find((n) => n.key === "incident");
   const incMetric = inc?.metrics.find((x) => x.m === m);
-  const unit = METRIC[m].unit;
+  const unit = t.metric[m].unit;
 
   return (
     <section className="page">
       <div>
         <div className="crumbs">
-          <Link href="/">Today</Link> / {METRIC[m].label}
+          <Link href="/">{t.nav.today}</Link> / {t.metric[m].label}
         </div>
         <h1 className="h1">
-          {data ? headline(data, today.baseline.day, today.baseline.of, incMetric?.since_min ?? null) : METRIC[m].label}
+          {data ? headline(data, today.baseline.day, today.baseline.of, incMetric?.since_min ?? null, t) : t.metric[m].label}
         </h1>
         <p className="lede">
-          {data?.now.ctx ? CTX_LABEL[data.now.ctx] : "—"}
-          {isVital(m) ? " · compared with your own readings at this time of day" : " · cabin air, same for the whole crew"}
+          {data?.now.ctx ? t.ctx[data.now.ctx] : "—"}
+          {isVital(m) ? p.vitalLede : p.cabinLede}
         </p>
       </div>
 
       <div ref={ref}>
         <div className="block-head">
-          <h2 className="h2">{METRIC[m].label}, {unit}</h2>
-          <div className="seg" role="group" aria-label="Period">
+          <h2 className="h2">{t.metric[m].label}, {unit}</h2>
+          <div className="seg" role="group" aria-label={p.period}>
             {RANGES.map((r) => (
-              <button key={r} aria-pressed={range === r} onClick={() => setRange(r)}>{RANGE_LABEL[r]}</button>
+              <button key={r} aria-pressed={range === r} onClick={() => setRange(r)}>{p.ranges[r]}</button>
             ))}
           </div>
         </div>
-        {err && !data && <p className="mute">{err === "no data for this crew member yet" ? "No readings in this period." : err}</p>}
+        {err && !data && <p className="mute">{err === "no data for this crew member yet" ? p.noReadings : err}</p>}
         {data && <MetricChart data={data} width={width} />}
       </div>
 
       {data && (
         <div className="cols">
           <div>
-            <h2 className="h2" style={{ marginBottom: 4 }}>Now</h2>
+            <h2 className="h2" style={{ marginBottom: 4 }}>{p.now}</h2>
             {[
-              ["Current", fmtUnit(data.now.value, m)],
-              ...(isVital(m) ? [["Your usual now", data.now.usual ? `${fmtRange(data.now.usual, m)} ${unit}` : "Still learning"]] : []),
+              [p.current, fmtUnit(data.now.value, m, t)],
+              ...(isVital(m) ? [[p.usualNow, data.now.usual ? `${fmtRange(data.now.usual, m)} ${unit}` : p.stillLearning]] : []),
               ...(isVital(m)
-                ? [["Difference", data.now.diff == null ? "—" : data.now.diff === 0 ? "Within range" : `${fmt(Math.abs(data.now.diff), m)} ${unit} ${data.now.diff < 0 ? "below" : "above"}`]]
+                ? [[p.difference, data.now.diff == null ? "—" : data.now.diff === 0 ? p.withinRange : p.diff(`${fmt(Math.abs(data.now.diff), m)} ${unit}`, data.now.diff < 0)]]
                 : data.limits.length
-                  ? [["Limit", `${data.limits[0].value} ${unit}`]]
+                  ? [[p.limit, `${data.limits[0].value} ${unit}`]]
                   : []),
-              ["Context", data.now.ctx ? CTX_LABEL[data.now.ctx] : "—"],
-              ["Signal", data.now.signal ? data.now.signal[0].toUpperCase() + data.now.signal.slice(1) : "—"],
+              [p.context, data.now.ctx ? t.ctx[data.now.ctx] : "—"],
+              [p.signal, data.now.signal ? t.signal[data.now.signal] : "—"],
             ].map(([k, v]) => (
               <div key={k} className="record-row">
                 <span className="k">{k}</span>
@@ -118,19 +119,19 @@ export function MetricView({ m }: { m: MetricKey }) {
             ))}
           </div>
           <div>
-            <h2 className="h2" style={{ marginBottom: 4 }}>Events</h2>
-            {data.events.length === 0 && <div className="empty">No deviations in this period.</div>}
+            <h2 className="h2" style={{ marginBottom: 4 }}>{p.events}</h2>
+            {data.events.length === 0 && <div className="empty">{p.noDeviations}</div>}
             {[...data.events].reverse().map((e) => {
               const dur = Math.max(1, Math.round(((e.ts_end ?? data.now_ts) - e.ts_start) / 60));
               return (
                 <div key={e.id} className="record-row">
-                  <span className="k num">{data.range === "7d" ? `${shortDay(e.ts_start)} ` : ""}{hhmm(e.ts_start)}</span>
+                  <span className="k num">{data.range === "7d" ? `${shortDay(e.ts_start, t)} ` : ""}{hhmm(e.ts_start)}</span>
                   <span className="v">
-                    <span style={{ color: levelColor(e.level), fontSize: 12, marginRight: 8 }}>{levelName(e.level)}</span>
-                    {e.pattern ? PATTERN_LABEL[e.pattern] ?? e.pattern : METRIC[m].label}
+                    <span style={{ color: levelColor(e.level), fontSize: 12, marginRight: 8 }}>{levelName(e.level, t)}</span>
+                    {e.pattern ? t.pattern[e.pattern] ?? e.pattern : t.metric[m].label}
                   </span>
                   <span className="n">
-                    {e.ts_end ? minutes(dur) : `ongoing · ${minutes(dur)}`} · {e.ack ? "acknowledged" : "not acknowledged"}
+                    {e.ts_end ? t.minutes(dur) : p.ongoing(t.minutes(dur))} · {e.ack ? p.acked : p.notAcked}
                   </span>
                 </div>
               );
@@ -140,9 +141,7 @@ export function MetricView({ m }: { m: MetricKey }) {
       )}
 
       <p className="foot-note">
-        {isVital(m)
-          ? "Your usual range is learned from the last 14 days of your own readings, separately for sleep, rest and time of day. Readings taken during an alert are not learned."
-          : "Cabin limits are fixed and the same for everyone aboard."}
+        {isVital(m) ? p.vitalFoot : p.cabinFoot}
       </p>
     </section>
   );

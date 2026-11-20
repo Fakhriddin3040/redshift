@@ -1,8 +1,11 @@
 // Interface copy built from server data (DESIGN_TZ §5.1, §5.4, §7, §12).
-// The server's own `text` (what / why / action) wins whenever it is present.
+// The server's own `text` (what / why / action) wins whenever it is present
+// and is written in the UI language (the server writes English only, see `Dict.serverText`).
 
+import type { Dict } from "@/i18n";
+import type { Dir } from "@/i18n/en";
 import type { Alert, AlertMetric, Card, MetricKey, Today } from "./types";
-import { METRIC, PATTERN_LABEL, ctxWord, fmtRange, fmtUnit, isVital, levelName, minutesWord } from "./format";
+import { fmtRange, fmtUnit, ctxWord, isVital } from "./format";
 
 export function direction(am: AlertMetric | undefined, card?: Card): "below" | "above" | null {
   if (!am) return null;
@@ -27,37 +30,38 @@ export function incidentOf(today: Today | null): Alert | undefined {
   return today?.notices.find((n) => n.key === "incident");
 }
 
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/** The server's text for an alert, when it is in the UI language. */
+const serverText = (a: Alert, t: Dict) => (t.serverText ? a.text : null);
 
 /** First sentence under the greeting on Today. */
-export function lede(today: Today): string {
+export function lede(today: Today, t: Dict): string {
   const inc = incidentOf(today);
   const open = today.notices.filter((n) => n.ack_ts == null).length;
   const primary = inc?.primary;
+  const what = inc && serverText(inc, t)?.what;
   // The server's sentence describes the incident at its worst and stays true during recovery.
-  if (today.level >= 1 && inc?.text?.what) {
-    return `${String(inc.text.what)}.${today.level === 3 ? " Follow the steps from the alert." : ""}`;
+  if (today.level >= 1 && what) {
+    return `${String(what)}.${today.level === 3 ? ` ${t.text.followSteps}` : ""}`;
   }
   if (today.level >= 2 && primary) {
     const am = inc!.metrics.find((x) => x.m === primary);
-    if (primary === "ppco2") return "Cabin CO₂ is above the 3.0 mmHg limit. Follow the crew procedure for high CO₂.";
-    if (primary === "press") return "Cabin pressure is dropping. Follow the crew procedure for a pressure leak.";
-    const dir = direction(am, cardOf(today, primary)) ?? "outside";
-    const where = dir === "outside" ? "outside" : dir;
-    if (today.level === 3) return `${METRIC[primary].label} is ${where} the safety limit. Follow the steps from the alert.`;
-    return `${METRIC[primary].label} is ${where} your usual range. Check the sensor fit and repeat the reading.`;
+    if (primary === "ppco2") return t.text.ledeCo2High;
+    if (primary === "press") return t.text.ledePressDrop;
+    const dir: Dir = direction(am, cardOf(today, primary)) ?? "outside";
+    if (today.level === 3) return t.text.ledeCritical(t.metric[primary].label, dir);
+    return t.text.ledeAlert(t.metric[primary].label, dir);
   }
   if (today.level === 1 && primary) {
     const am = inc!.metrics.find((x) => x.m === primary);
-    if (!isVital(primary)) return `${METRIC[primary].label} in the cabin is slightly above its limit. Everything else is within range.`;
-    const dir = direction(am, cardOf(today, primary)) ?? "outside";
-    return `${METRIC[primary].label} is slightly ${dir} your usual range. Everything else is within it.`;
+    if (!isVital(primary)) return t.text.ledeWatchCabin(t.metric[primary].label);
+    const dir: Dir = direction(am, cardOf(today, primary)) ?? "outside";
+    return t.text.ledeWatch(t.metric[primary].label, dir);
   }
   if (today.baseline.state === "learning") {
-    return `Vigil is still learning your usual ranges — day ${today.baseline.day} of ${today.baseline.of}. Until then, only fixed safety limits apply.`;
+    return t.text.ledeLearning(today.baseline.day, today.baseline.of);
   }
-  if (open === 0) return "Everything is within your own usual range.";
-  return `${open === 1 ? "One notice needs" : `${open} notices need`} your attention. Everything else is within your own usual range.`;
+  if (open === 0) return t.text.ledeAllUsual;
+  return t.text.ledeOpen(open);
 }
 
 export interface NoticeText {
@@ -70,13 +74,15 @@ export interface NoticeText {
 }
 
 /** "Heart rate is rising at rest" for secondary metrics of an incident. */
-function companion(am: AlertMetric, ctx: Alert["ctx"]): string {
-  const name = cap(METRIC[am.m].lower);
+function companion(am: AlertMetric, ctx: Alert["ctx"], t: Dict): string {
+  const name = t.metric[am.m].lower;
   if (am.trend === "rising" || am.trend === "falling") {
-    return `${name} is ${am.trend}${isVital(am.m) ? ` while ${ctxWord(ctx)}` : ""}`;
+    return t.text.companionTrend(name, am.trend, isVital(am.m) ? ctxWord(ctx, t) : null);
   }
-  return `${name} is ${fmtUnit(am.value, am.m)}`;
+  return t.text.companionValue(name, fmtUnit(am.value, am.m, t));
 }
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function measured(today: Today | null, m: MetricKey) {
   const c = cardOf(today, m);
@@ -84,139 +90,118 @@ function measured(today: Today | null, m: MetricKey) {
 }
 
 /** "cabin CO₂ and pressure are normal" — only for what is actually measured (§12). */
-function cabinNormal(inc: Alert, today: Today | null): string | null {
+function cabinNormal(inc: Alert, today: Today | null, t: Dict): string | null {
   const flagged = new Set(inc.metrics.map((x) => x.m));
   const ok = (["ppco2", "press"] as const).filter((m) => !flagged.has(m) && measured(today, m));
-  if (ok.length === 2) return "cabin CO₂ and pressure are normal";
-  if (ok.length === 1) return ok[0] === "ppco2" ? "cabin CO₂ is normal" : "cabin pressure is normal";
+  if (ok.length === 2) return t.text.cabinBothNormal;
+  if (ok.length === 1) return ok[0] === "ppco2" ? t.text.cabinCo2Normal : t.text.cabinPressNormal;
   return null;
 }
 
-export function incidentWhy(inc: Alert, today: Today | null): string {
-  if (inc.text?.why) return String(inc.text.why);
+export function incidentWhy(inc: Alert, today: Today | null, t: Dict): string {
+  const why = serverText(inc, t)?.why;
+  if (why) return String(why);
   const primary = inc.primary;
   const am = inc.metrics.find((x) => x.m === primary);
   const parts: string[] = [];
   if (am && primary) {
-    parts.push(am.usual ? `${fmtUnit(am.value, primary)}, usual ${fmtRange(am.usual, primary)}.` : `${fmtUnit(am.value, primary)}.`);
+    const v = fmtUnit(am.value, primary, t);
+    parts.push(am.usual ? t.text.valueUsual(v, fmtRange(am.usual, primary)) : `${v}.`);
   }
-  const rest = inc.metrics.filter((x) => x.m !== primary).map((x) => companion(x, inc.ctx));
-  const cabin = cabinNormal(inc, today);
+  const rest = inc.metrics.filter((x) => x.m !== primary).map((x) => companion(x, inc.ctx, t));
+  const cabin = cabinNormal(inc, today, t);
   const tail = [...rest, ...(cabin ? [cabin] : [])];
   if (tail.length) parts.push(cap(tail.join("; ")) + ".");
   return parts.join(" ");
 }
 
-export function incidentTitle(inc: Alert, today: Today | null): string {
-  if (inc.text?.what) return String(inc.text.what);
+export function incidentTitle(inc: Alert, today: Today | null, t: Dict): string {
+  const what = serverText(inc, t)?.what;
+  if (what) return String(what);
   const m = inc.primary;
-  if (!m) return "Readings outside the usual range";
+  if (!m) return t.text.titleNoPrimary;
   const am = inc.metrics.find((x) => x.m === m);
-  const dur = minutesWord(Math.max(1, am?.since_min ?? inc.since_min));
-  if (m === "ppco2") return `Cabin CO₂ above the 3.0 mmHg limit for ${dur}`;
-  if (m === "press") return `Cabin pressure ${am?.trend === "falling" ? "falling" : "low"} for ${dur}`;
-  const dir = direction(am, cardOf(today, m));
-  if (inc.source === "hard" || !am?.usual) {
-    return `${METRIC[m].label} ${dir ?? "outside"} the safety limit for ${dur}`;
-  }
-  return `${METRIC[m].label} ${dir ?? "outside"} your usual range for ${dur}`;
+  const dur = t.minutesWord(Math.max(1, am?.since_min ?? inc.since_min));
+  if (m === "ppco2") return t.text.titleCo2(dur);
+  if (m === "press") return t.text.titlePress(am?.trend === "falling", dur);
+  const dir: Dir = direction(am, cardOf(today, m)) ?? "outside";
+  if (inc.source === "hard" || !am?.usual) return t.text.titleHard(t.metric[m].label, dir, dur);
+  return t.text.titleUsual(t.metric[m].label, dir, dur);
 }
 
-export function noticeText(n: Alert, today: Today | null): NoticeText {
+export function noticeText(n: Alert, today: Today | null, t: Dict): NoticeText {
   if (n.key === "baseline_learned") {
     return {
-      label: "Note",
-      title: "Your usual ranges are set",
-      body: "Learned from 7 days of your own readings. They keep adjusting slowly as you adapt.",
+      label: t.text.baselineLabel,
+      title: t.text.baselineTitle,
+      body: t.text.baselineBody,
       explained: false,
       tone: "var(--mute)",
     };
   }
   if (n.key.startsWith("checkin:")) {
     return {
-      label: "To do",
-      title: "Daily check-in not yet filed",
-      body: "About one minute. Until it is filed, today is shown to the ground as “no data”, never as “fine”.",
-      action: { label: "Start check-in", href: "/checkin" },
+      label: t.text.checkinLabel,
+      title: t.text.checkinTitle,
+      body: t.text.checkinBody,
+      action: { label: t.text.checkinAction, href: "/checkin" },
       explained: false,
       tone: "var(--mute)",
     };
   }
   const lvl = Math.max(n.level, n.ack_ts ? 0 : n.peak_level) as Alert["level"];
   const shown = n.level || n.peak_level;
-  const topic = n.pattern ? PATTERN_LABEL[n.pattern] ?? n.pattern : n.primary ? METRIC[n.primary].label : "Readings";
+  const topic = n.pattern ? t.pattern[n.pattern] ?? n.pattern : n.primary ? t.metric[n.primary].label : t.text.readings;
   return {
-    label: `${n.ts_end ? "Ended" : levelName(shown)} · ${topic}`,
-    title: incidentTitle(n, today),
-    body: incidentWhy(n, today),
-    action: n.primary ? { label: `Open ${METRIC[n.primary].lower}`, href: `/metric/${n.primary}` } : undefined,
-    explained: n.text_src != null && n.text_src !== "template",
+    label: `${n.ts_end ? t.text.ended : t.levels[shown]} · ${topic}`,
+    title: incidentTitle(n, today, t),
+    body: incidentWhy(n, today, t),
+    action: n.primary ? { label: t.text.openMetric(t.metric[n.primary].lower), href: `/metric/${n.primary}` } : undefined,
+    explained: t.serverText && n.text_src != null && n.text_src !== "template",
     tone: lvl >= 2 ? "var(--attn)" : lvl === 1 ? "var(--kick)" : "var(--mute)",
   };
 }
 
 /** One sentence for the Alert / Critical banner (§4.4). */
-export function bannerText(today: Today): string {
+export function bannerText(today: Today, t: Dict): string {
   const inc = incidentOf(today);
-  if (!inc) return "A reading is outside its safe range.";
-  if (inc.text?.what) return String(inc.text.what);
+  if (!inc) return t.text.bannerNone;
+  const what = serverText(inc, t)?.what;
+  if (what) return String(what);
   const m = inc.primary;
-  if (!m) return "Readings are outside your usual range.";
+  if (!m) return t.text.bannerNoPrimary;
   const am = inc.metrics.find((x) => x.m === m);
-  const dur = minutesWord(Math.max(1, am?.since_min ?? inc.since_min));
-  if (!isVital(m)) return `${cap(METRIC[m].lower)} has been outside its limit for ${dur}.`;
-  const dir = direction(am, cardOf(today, m)) ?? "outside";
-  const ref = inc.source === "hard" || !am?.usual ? "the safety limit" : "your usual range";
-  return `${METRIC[m].label} has been ${dir} ${ref} for ${dur}${inc.ctx ? ` while ${ctxWord(inc.ctx)}` : ""}.`;
+  const dur = t.minutesWord(Math.max(1, am?.since_min ?? inc.since_min));
+  if (!isVital(m)) return t.text.bannerCabin(t.metric[m].lower, dur);
+  const dir: Dir = direction(am, cardOf(today, m)) ?? "outside";
+  const hard = inc.source === "hard" || !am?.usual;
+  return t.text.bannerVital(t.metric[m].label, dir, hard, dur, inc.ctx ? ctxWord(inc.ctx, t) : null);
 }
 
 /** Steps for the Critical screen: at most three (§7). */
-export function criticalSteps(inc: Alert): string[] {
-  const a = inc.text?.action;
+export function criticalSteps(inc: Alert, t: Dict): string[] {
+  const a = serverText(inc, t)?.action;
   if (Array.isArray(a)) return a.slice(0, 3).map(String);
   if (typeof a === "string" && a) return [a];
-  switch (inc.primary) {
-    case "spo2":
-      return [
-        "Check the sensor fit and repeat the reading with the kit oximeter.",
-        "If it stays at 91 % or below, notify the crew medical officer.",
-      ];
-    case "hr":
-      return [
-        "Stop activity, sit or anchor yourself and breathe slowly for two minutes.",
-        "Repeat the reading. If it does not settle, notify the crew medical officer.",
-      ];
-    case "rr":
-      return [
-        "Check the sensor fit and count your breaths for one minute.",
-        "If it does not settle, notify the crew medical officer.",
-      ];
-    case "ppco2":
-      return ["Move to a module with fresh airflow.", "Report the reading to the ground and the commander."];
-    case "press":
-      return ["Follow the emergency procedure for a pressure leak.", "Notify the commander and the ground."];
-    default:
-      return ["Check the sensor fit and repeat the reading.", "Notify the crew medical officer."];
-  }
+  return t.text.steps[inc.primary ?? "default"] ?? t.text.steps.default;
 }
 
-export function criticalWhy(inc: Alert, today: Today | null): string {
-  if (inc.text?.why) return String(inc.text.why);
+export function criticalWhy(inc: Alert, today: Today | null, t: Dict): string {
+  const why = serverText(inc, t)?.why;
+  if (why) return String(why);
   const primary = inc.primary;
   const am = inc.metrics.find((x) => x.m === primary);
   const parts: string[] = [];
   if (primary && am) {
-    parts.push(
-      `${METRIC[primary].label} is ${am.trend === "rising" || am.trend === "falling" ? am.trend : "outside its safe range"}` +
-        (isVital(primary) ? ` while ${ctxWord(inc.ctx)}` : "") + "."
-    );
+    const trend = am.trend === "rising" || am.trend === "falling" ? am.trend : null;
+    parts.push(t.text.critPrimary(t.metric[primary].label, trend, isVital(primary) ? ctxWord(inc.ctx, t) : null));
   }
-  const others = inc.metrics.filter((x) => x.m !== primary).map((x) => companion(x, inc.ctx));
+  const others = inc.metrics.filter((x) => x.m !== primary).map((x) => companion(x, inc.ctx, t));
   if (others.length) parts.push(cap(others.join("; ")) + ".");
-  const cabin = cabinNormal(inc, today);
+  const cabin = cabinNormal(inc, today, t);
   if (cabin) parts.push(cap(cabin) + ".");
-  if (inc.pattern && PATTERN_LABEL[inc.pattern]) {
-    parts.push(`This matches ${PATTERN_LABEL[inc.pattern].toLowerCase()}${inc.ctx !== "active" ? ", not exercise" : ""}.`);
+  if (inc.pattern && t.pattern[inc.pattern]) {
+    parts.push(t.text.matchesPattern(t.pattern[inc.pattern], inc.ctx !== "active"));
   }
   return parts.join(" ");
 }
