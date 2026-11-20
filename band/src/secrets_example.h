@@ -6,7 +6,7 @@
 #define DEVICE_ID   "astro-band-01"
 
 // wss://WS_HOST:WS_PORT/WS_PATH
-#define WS_HOST     "example.com"
+#define WS_HOST     "redshift.fakhriddin.dev"
 #define WS_PORT     443
 #define WS_PATH     "/ws/device"
 
